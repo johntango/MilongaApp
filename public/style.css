@@ -233,11 +233,21 @@
         background: #047857;
         border-color: #059669;
       }
-      .retry-btn.problem {
-        background: #dc2626;
-        border-color: #f87171;
+            .retry-btn.problem {
+        background: #991b1b;
+        border-color: #dc2626;
         color: white;
-        animation: pulse-problem 2s infinite;
+        animation: pulse-red 2s infinite;
+      }
+
+      /* Cortina mode indicator styling */
+      #cortina-mode-indicator {
+        font-style: italic;
+        font-weight: 500;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: rgba(94, 234, 212, 0.1);
+        transition: all 0.3s ease;
       }
       @keyframes pulse-problem {
         0%, 100% { opacity: 1; }

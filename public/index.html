@@ -67,6 +67,12 @@
         <option value="country">Country</option>
         <option value="blues">Blues</option>
       </select>
+      <span
+        id="cortina-mode-indicator"
+        class="muted"
+        style="font-size: 0.8em; margin-left: 4px"
+        >Mode: Planning</span
+      >
     </header>
     <span id="status-badge" class="badge" title="Background activity"
       >Idle</span
@@ -129,6 +135,7 @@
       const summaryEl = $("#summary");
       const cortinaGenreSel = $("#cortina-genre");
       const tangoGenreSel = $("#tango-genre");
+      const cortinaModeIndicator = $("#cortina-mode-indicator");
 
       let PLAN = null; // current plan { tandas: [...] }
       let curIdx = -1; // index into plan.tandas[*]
@@ -139,6 +146,47 @@
 
       // Track current replacement session to avoid repetition within the same replacement attempt
       let currentReplacementSession = null; // { tandaIndex, trackIndex, attempted: Set() }
+
+      // Update cortina mode indicator based on current state
+      function updateCortinaModeIndicator() {
+        // Defensive check - ensure elements exist
+        if (!cortinaModeIndicator || !cortinaGenreSel) {
+          console.debug("[CORTINA] Mode indicator elements not ready yet");
+          return;
+        }
+
+        const isPlaylistActive =
+          PLAN && Array.isArray(PLAN.tandas) && PLAN.tandas.length > 0;
+        const selectedGenre = cortinaGenreSel.value || "auto";
+
+        if (isPlaylistActive) {
+          if (selectedGenre === "auto") {
+            cortinaModeIndicator.textContent = "Mode: Auto (replacing)";
+            cortinaModeIndicator.style.color = "#666";
+          } else {
+            cortinaModeIndicator.textContent = `Mode: ${selectedGenre} (replacing)`;
+            cortinaModeIndicator.style.color = "#0066cc";
+          }
+        } else {
+          if (selectedGenre === "auto") {
+            cortinaModeIndicator.textContent = "Mode: Auto (planning)";
+            cortinaModeIndicator.style.color = "#666";
+          } else {
+            cortinaModeIndicator.textContent = `Mode: ${selectedGenre} (planning)`;
+            cortinaModeIndicator.style.color = "#0066cc";
+          }
+        }
+      }
+
+      // Add event listener for cortina genre dropdown
+      if (cortinaGenreSel) {
+        cortinaGenreSel.addEventListener("change", () => {
+          updateCortinaModeIndicator();
+          console.log(
+            `[CORTINA] Genre selection changed to: ${cortinaGenreSel.value}`
+          );
+        });
+      }
 
       function clearReplacementHistory() {
         currentReplacementSession = null;
@@ -265,8 +313,13 @@
       }
       function effectiveCortinaGenreFor(ti, blk) {
         const sel = (cortinaGenreSel?.value || "auto").toLowerCase();
-        if (sel !== "auto") return sel; // DJ-picked genre wins
-        return deriveCortinaGenre(blk, ti); // your existing inference
+        if (sel !== "auto") {
+          // Mode 2: When playlist is active, use selected genre for replacements
+          console.log(`[CORTINA] Using DJ-selected genre: ${sel}`);
+          return sel;
+        }
+        // Mode 1 & Auto mode: Use existing inference logic
+        return deriveCortinaGenre(blk, ti);
       }
 
       function effectiveTangoGenreFor(ti, blk) {
@@ -367,11 +420,27 @@
         .getElementById("scheduleSelect")
         .addEventListener("change", (e) => {
           const selectedFile = e.target.value;
+          if (!selectedFile) return;
+
           fetch(`/schedules/${selectedFile}`)
-            .then((res) => res.json())
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error(
+                  `Failed to load schedule: ${res.status} ${res.statusText}`
+                );
+              }
+              return res.json();
+            })
             .then((schedule) => {
               console.log("Loaded tanda schedule:", schedule);
-              buildPlanFromSchedule(schedule.tandas);
+
+              // Try different schedule formats
+              const tandas = schedule.tandas || schedule.slots || schedule;
+              if (Array.isArray(tandas)) {
+                buildPlanFromSchedule(tandas);
+              } else {
+                console.warn("Schedule format not recognized:", schedule);
+              }
             })
             .catch((err) => {
               console.error("Failed to load schedule:", err);
@@ -518,12 +587,18 @@
           ? normalizeSlots({ pattern: state.loadedScheduleSlots })
           : normalizeSlots({ pattern, schedule });
 
+        // Get cortina genre from dropdown (Mode 1: planning)
+        const cortinaGenre = cortinaGenreSel?.value || "auto";
+        const cortinaGenres =
+          cortinaGenre === "auto" ? undefined : [cortinaGenre];
+
         // keep backward compat for server that still reads 'pattern' (optional):
         return {
           minutes,
           sizes,
           catalog: window.catalogArt, // you already populate this
           slots, // ← NEW canonical field
+          cortinaGenres, // ← NEW: cortina genre selection
           // pattern, schedule           // (optional) send if server still expects legacy
         };
       }
@@ -675,8 +750,43 @@
 
       function buildTanda(catalog, role, length = 4) {
         const tanda = [];
+
+        // Filter for only tango-related tracks first
+        const tangoTracks = catalog.tracks.filter((track) => {
+          const genres = track.styles || track.tags?.genre || [];
+          const genreList = Array.isArray(genres) ? genres : [genres];
+
+          const hasTangoGenre = genreList.some((genre) => {
+            const g = String(genre || "")
+              .toLowerCase()
+              .trim();
+            return (
+              g === "tango" || g === "vals" || g === "valse" || g === "milonga"
+            );
+          });
+
+          // Debug: log non-tango tracks that might be getting through
+          if (
+            !hasTangoGenre &&
+            (track.artist?.toLowerCase().includes("nelson") ||
+              track.artist?.toLowerCase().includes("cash"))
+          ) {
+            console.log(
+              `[TANDA] Filtering OUT non-tango track: ${track.artist} - ${
+                track.title
+              } (genres: ${JSON.stringify(genreList)})`
+            );
+          }
+
+          return hasTangoGenre;
+        });
+
+        console.log(
+          `[TANDA] Building ${role} tanda from ${tangoTracks.length} tango tracks (filtered from ${catalog.tracks.length} total)`
+        );
+
         for (let i = 0; i < length; i++) {
-          const candidates = catalog.tracks
+          const candidates = tangoTracks
             .map((track) => ({
               track,
               score: scoreTrackByRole(track, role, tanda),
@@ -685,7 +795,25 @@
             .map((entry) => entry.track);
 
           const selected = candidates.find((c) => !tanda.includes(c));
-          if (selected) tanda.push(selected);
+          if (selected) {
+            // Format the track properly for playback
+            const formattedTrack = {
+              id: selected.id || selected.absolutePath, // Use existing id or path
+              title: selected.title || selected.tags?.title || "Unknown",
+              artist: selected.artist || selected.tags?.artist || null,
+              album: selected.album || selected.tags?.album || null,
+              BPM: selected.BPM || getBPM(selected) || null,
+              Energy: selected.Energy || selected.tags?.Energy || null,
+              Key: selected.Key || selected.tags?.Key || null,
+              camelotKey:
+                selected.camelotKey || selected.tags?.camelotKey || null,
+              seconds:
+                selected.durationSec || selected.format?.durationSec || null,
+              absPath:
+                selected.absolutePath || getAbsolutePath(selected.file) || null,
+            };
+            tanda.push(formattedTrack);
+          }
         }
         return tanda;
       }
@@ -703,6 +831,11 @@
       function buildPlanFromSchedule(tandaSchedule) {
         if (!window.catalogArt || !window.catalogArt.tracks) {
           console.warn("Catalog not yet loaded.");
+          return;
+        }
+
+        if (!tandaSchedule || !Array.isArray(tandaSchedule)) {
+          console.warn("Invalid tanda schedule provided:", tandaSchedule);
           return;
         }
         async function requestReplacement({
@@ -739,8 +872,14 @@
         }
         const catalog = window.catalogArt;
         const tandas = tandaSchedule.map((entry, i) => {
-          const tracks = buildTanda(catalog, entry.role, 4); // or 3, 5, etc.
-          return { style: "Tango", tracks }; // Adjust style if needed
+          // Handle both old format (entry.role) and new format (entry has style/role)
+          const role = entry.role || "classic";
+          const style = entry.style || "Tango";
+          const tracks = buildTanda(catalog, role, 4); // or 3, 5, etc.
+          return {
+            style: style.charAt(0).toUpperCase() + style.slice(1), // Capitalize style
+            tracks,
+          };
         });
 
         window.PLAN = { tandas };
@@ -844,29 +983,38 @@
         if (!isCortinaBlock(blk)) return;
         // ➊ Resolve genre from selector (or infer if "auto")
         const cortinagenre = effectiveCortinaGenreFor(ti, blk);
-        // ➋ Ensure the pool for this genre is fetched on first use
+        console.log(
+          `[CORTINA] Replacing cortina at ${ti} with genre: ${cortinagenre}`
+        );
 
-        // ➌ Draw the next item from that genre’s pool
-        const currentId = blk.streamId || blk?.tracks?.[0]?.id || null;
-        const repl = nextCortina(currentId, cortinagenre);
+        try {
+          // ➌ Draw the next item from that genre’s pool
+          const currentId = blk.streamId || blk?.tracks?.[0]?.id || null;
+          const repl = await nextCortina(currentId, cortinagenre);
 
-        if (!repl) {
-          alert("No alternative cortinas available.");
-          return;
+          if (!repl) {
+            alert(
+              `No alternative cortinas available for genre: ${cortinagenre}`
+            );
+            return;
+          }
+
+          // Normalize the replacement payload for the updater
+          const seconds = Number.isFinite(repl.seconds) ? repl.seconds : 60;
+          replaceCortinaAt(ti, {
+            id: repl.id,
+            title: repl.title || "Cortina",
+            artist: repl.artist ?? repl.singer ?? null,
+            singer: repl.singer ?? null,
+            approxMinutes:
+              repl.approxMinutes ?? Math.max(1, Math.round(seconds / 60)),
+            seconds,
+            cortinagenre, // persists on block as cortinaGenre
+          });
+        } catch (error) {
+          console.error(`[CORTINA] Failed to replace cortina:`, error);
+          alert(`Failed to replace cortina: ${error.message}`);
         }
-
-        // Normalize the replacement payload for the updater
-        const seconds = Number.isFinite(repl.seconds) ? repl.seconds : 60;
-        replaceCortinaAt(ti, {
-          id: repl.id,
-          title: repl.title || "Cortina",
-          artist: repl.artist ?? repl.singer ?? null,
-          singer: repl.singer ?? null,
-          approxMinutes:
-            repl.approxMinutes ?? Math.max(1, Math.round(seconds / 60)),
-          seconds,
-          cortinagenre, // persists on block as cortinaGenre
-        });
       });
 
       const statusBadge = $("#status-badge");
@@ -936,13 +1084,44 @@
           secs = Math.round((m - mins) * 60);
         return `${mins}:${String(secs).padStart(2, "0")}`;
       }
+
+      // Helper functions for buildGenerateBody
+      function getMinutesFromUI() {
+        return $("#minutes")?.value || "180";
+      }
+
+      function getPatternFromUI() {
+        // Default pattern if not set elsewhere
+        return ["Tango", "Tango", "Vals", "Tango", "Tango", "Milonga"];
+      }
+
+      function getScheduleRolesFromUI() {
+        // Return null to use default roles
+        return null;
+      }
+
+      function getSize(style) {
+        const defaults = { Tango: 4, Vals: 3, Milonga: 3 };
+        return defaults[style] || 3;
+      }
       function clockAdd(minutes) {
         const d = new Date();
         d.setMinutes(d.getMinutes() + Math.round(minutes));
         return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
       }
       function streamUrl(streamId) {
-        return `/stream/${ensureStreamId(streamId)}`;
+        const encodedId = ensureStreamId(streamId);
+        console.log(
+          `[STREAM] Original ID: ${streamId?.substring(0, 100)}${
+            streamId?.length > 100 ? "..." : ""
+          }`
+        );
+        console.log(
+          `[STREAM] Encoded ID: ${encodedId?.substring(0, 100)}${
+            encodedId?.length > 100 ? "..." : ""
+          }`
+        );
+        return `/stream/${encodedId}`;
       }
       // --- base64url helpers for /stream/:id ---
       function toB64Url(str) {
@@ -960,8 +1139,22 @@
       // Produce a safe stream id either way.
       function ensureStreamId(id) {
         if (!id) return "";
-        // If it looks like base64url, keep; if it contains '/', it's a path -> encode
-        if (/^[A-Za-z0-9\-_]+$/.test(id) && !id.includes("/")) return id;
+
+        // If it's already a reasonable base64url (short-ish and no path separators), keep it
+        if (
+          /^[A-Za-z0-9\-_]+$/.test(id) &&
+          !id.includes("/") &&
+          id.length < 200
+        ) {
+          return id;
+        }
+
+        // If it's a file path (contains / or \) or very long base64, encode it
+        if (id.includes("/") || id.includes("\\") || id.length >= 200) {
+          return toB64Url(id);
+        }
+
+        // For anything else, encode it to be safe
         return toB64Url(id);
       }
 
@@ -1169,6 +1362,7 @@
         curIdx = -1;
         curTrackOffset = 0;
         renderPlan();
+        updateCortinaModeIndicator(); // Update mode indicator
 
         // UI niceties
         const minutesPlanned =
@@ -1189,6 +1383,15 @@
 
       // On page load, fetch list once
       refreshPlaylistList();
+
+      // Initialize cortina mode indicator (defensive)
+      setTimeout(() => {
+        try {
+          updateCortinaModeIndicator();
+        } catch (error) {
+          console.warn("[CORTINA] Failed to initialize mode indicator:", error);
+        }
+      }, 100);
 
       // ====== Tanda Library Functions ======
 
@@ -1361,8 +1564,11 @@
         const g = document.createElement("small");
         g.className = "muted";
         g.style.marginLeft = "8px";
-        if (isCortina && blk.cortinaGenre)
-          g.textContent = `(${blk.cortinaGenre})`;
+        if (isCortina && blk.cortinaGenre) {
+          const genreDisplay =
+            blk.cortinaGenre === "default" ? "auto" : blk.cortinaGenre;
+          g.textContent = `(${genreDisplay})`;
+        }
         if (!isCortina && blk.tangoGenre) g.textContent = `(${blk.tangoGenre})`;
         const buttonsContainer = document.createElement("div");
         buttonsContainer.style.marginLeft = "auto";
@@ -1642,6 +1848,7 @@
                   } tandas)`;
                   etaEl.textContent = clockAdd(minutesPlanned);
                   setStatus({ text: "Ready", state: "ok" });
+                  updateCortinaModeIndicator(); // Update mode indicator
                   break;
                 }
 
@@ -1856,6 +2063,7 @@
         etaEl.textContent = clockAdd(minutesPlanned);
         nowEl.textContent = "–";
         player.src = "";
+        updateCortinaModeIndicator(); // Update mode indicator
       }
 
       // ---------- Timeline rendering & playback ----------
@@ -2116,20 +2324,149 @@
       function setCortinaPool(list) {
         window.cortinaPool = Array.isArray(list) ? list.slice() : [];
         window.cortinaIdx = 0;
+        console.log(
+          `[CORTINA] Pool updated: ${window.cortinaPool.length} cortinas available`
+        );
       }
 
-      function nextCortina(excludeId = null) {
-        const pool = window.cortinaPool || [];
-        if (!pool.length) return null;
+      // Genre-specific cortina pools cache
+      window.cortinaPoolsByGenre = window.cortinaPoolsByGenre || {};
 
-        // try up to pool.length to avoid returning the same item
-        for (let n = 0; n < pool.length; n++) {
-          const c = pool[window.cortinaIdx % pool.length];
-          window.cortinaIdx++;
-          if (!excludeId || c.id !== excludeId) return c;
+      // Fetch cortinas for a specific genre from the server
+      async function fetchCortinasByGenre(genre) {
+        if (!genre || genre === "auto") {
+          genre = "default"; // Use default mix when auto
         }
-        // fallback if all equal
-        return pool[window.cortinaIdx++ % pool.length];
+
+        // Check if we already have this genre cached
+        if (window.cortinaPoolsByGenre[genre]) {
+          console.log(
+            `[CORTINA] Using cached ${genre} cortinas: ${window.cortinaPoolsByGenre[genre].length} available`
+          );
+          return window.cortinaPoolsByGenre[genre];
+        }
+
+        try {
+          console.log(`[CORTINA] Fetching ${genre} cortinas from server...`);
+
+          // Try to get all tracks and filter for non-tango genres
+          // This will include jazz, rock, country, blues, etc. from the catalog
+          const response = await fetch("/api/catalog/compact?pageSize=1000", {
+            method: "GET",
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to fetch cortinas: ${response.status}`);
+          }
+
+          const data = await response.json();
+          let cortinas = (data.tracks || []).filter((track) => {
+            const genres = (track.styles || []).map((s) => s.toLowerCase());
+            const isNonTango =
+              !genres.includes("tango") &&
+              !genres.includes("vals") &&
+              !genres.includes("milonga");
+
+            if (genre === "default") {
+              return isNonTango; // Return any non-tango for default
+            }
+
+            return isNonTango && genres.includes(genre.toLowerCase());
+          });
+
+          // If no matches for specific genre, fall back to any non-tango
+          if (cortinas.length === 0 && genre !== "default") {
+            console.log(
+              `[CORTINA] No ${genre} cortinas found, falling back to any non-tango`
+            );
+            cortinas = (data.tracks || []).filter((track) => {
+              const genres = (track.styles || []).map((s) => s.toLowerCase());
+              return (
+                !genres.includes("tango") &&
+                !genres.includes("vals") &&
+                !genres.includes("milonga")
+              );
+            });
+          }
+
+          // Transform to cortina format
+          const formattedCortinas = cortinas.map((track) => ({
+            id: track.id,
+            title: track.title,
+            artist: track.artist,
+            genre: genre,
+            seconds: track.durationSec || 60,
+            approxMinutes: Math.max(
+              1,
+              Math.round((track.durationSec || 60) / 60)
+            ),
+          }));
+
+          // Cache the result
+          window.cortinaPoolsByGenre[genre] = formattedCortinas;
+          console.log(
+            `[CORTINA] Cached ${formattedCortinas.length} ${genre} cortinas`
+          );
+
+          return formattedCortinas;
+        } catch (error) {
+          console.error(`[CORTINA] Failed to fetch ${genre} cortinas:`, error);
+
+          // Fallback to existing pool if available
+          if (window.cortinaPool && window.cortinaPool.length > 0) {
+            console.log(`[CORTINA] Using existing pool as fallback`);
+            return window.cortinaPool;
+          }
+
+          return [];
+        }
+      }
+
+      async function nextCortina(excludeId = null, genre = "auto") {
+        console.log(
+          `[CORTINA] Requesting next cortina for genre: ${genre}, excluding: ${excludeId}`
+        );
+
+        // Ensure we have cortinas for the requested genre
+        let pool = [];
+
+        if (genre && genre !== "auto") {
+          // Get genre-specific pool
+          pool = await fetchCortinasByGenre(genre);
+        } else {
+          // Use existing global pool or fetch default
+          pool = window.cortinaPool || [];
+          if (!pool.length) {
+            pool = await fetchCortinasByGenre("default");
+          }
+        }
+
+        if (!pool.length) {
+          console.warn(`[CORTINA] No cortinas available for genre: ${genre}`);
+          return null;
+        }
+
+        console.log(
+          `[CORTINA] Pool has ${pool.length} cortinas for genre: ${genre}`
+        );
+
+        // Filter out the excluded ID
+        const available = pool.filter((c) => !excludeId || c.id !== excludeId);
+
+        if (!available.length) {
+          console.warn(`[CORTINA] All cortinas excluded for genre: ${genre}`);
+          // Return a random one anyway if all are excluded
+          return pool[Math.floor(Math.random() * pool.length)];
+        }
+
+        // Return a random selection from available cortinas
+        const selected =
+          available[Math.floor(Math.random() * available.length)];
+        console.log(
+          `[CORTINA] Selected: ${selected.title} by ${selected.artist}`
+        );
+
+        return selected;
       }
 
       function applyReplacement(tandaIndex, trackIndex, opt) {

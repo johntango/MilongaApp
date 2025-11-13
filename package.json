@@ -7,6 +7,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.21.1",
     "@openai/agents": "^0.1.9",
     "@openai/agents-openai": "^0.1.9",
     "dotenv": "^17.2.3",

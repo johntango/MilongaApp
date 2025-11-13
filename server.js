@@ -335,7 +335,16 @@ const MIME = {
 app.get("/stream/:id", async (req, res) => {
   try {
     const absPath = b64u.dec(req.params.id);
-    if (!fs.existsSync(absPath)) return res.status(404).send("Not found");
+    console.log(`[STREAM] Requested path: ${absPath}`);
+    if (!fs.existsSync(absPath)) {
+      console.log(`[STREAM] File not found: ${absPath}`);
+      // In demo mode, return a silent audio file or placeholder
+      return res.status(404).json({
+        error: "Audio file not available in CodeSpace",
+        message: "Files are on local machine only",
+        requestedFile: path.basename(absPath)
+      });
+    }
     const stat = await fsp.stat(absPath);
     const total = stat.size;
     const ext = path.extname(absPath).toLowerCase();
@@ -363,22 +372,34 @@ app.get("/stream/:id", async (req, res) => {
   }
 });
 // DELETE /api/playlists/:id  -> { ok: true }
-app.delete("/api/playlists/:id", async (req, res) => {
-  try {
-    const want = String(req.params.id || "");
-    if (!want) return res.status(400).json({ error: "Missing id" });
+// GET /api/files-status -> check which files are available
+app.get("/api/files-status", (req, res) => {
+  const sampleTracks = LIBRARY.slice(0, 10);
+  const status = sampleTracks.map(track => {
+    const absPath = track.file?.absPath || track.absolutePath;
+    return {
+      title: track.tags?.title || "Unknown",
+      artist: track.tags?.artist || "Unknown",
+      path: absPath,
+      exists: absPath ? fs.existsSync(absPath) : false
+    };
+  });
+  res.json({
+    totalTracks: LIBRARY.length,
+    sampledTracks: status,
+    availableFiles: status.filter(s => s.exists).length
+  });
+});
 
-    const files = (await fsp.readdir(PLAYLISTS_DIR))
-      .filter(f => f.endsWith(".json") && f.includes(`-${want}-`));
-
-    if (!files.length) return res.status(404).json({ error: "Not found" });
-
-    // If multiple match (shouldn’t), remove all; typically there’s one
-    await Promise.all(files.map(fn => fsp.unlink(path.join(PLAYLISTS_DIR, fn))));
-    return res.json({ ok: true, deleted: files.length });
-  } catch (e) {
-    console.error("[playlists] delete failed:", e);
-    return res.status(500).json({ error: String(e?.message || e) });
+// DELETE /api/playlists/:id  -> { ok: true }
+app.delete("/api/playlists/:id", (req, res) => {
+  const id = req.params.id;
+  const file = path.join(PLAYLISTS_DIR, id + ".json");
+  if (fs.existsSync(file)) {
+    fs.unlinkSync(file);
+    res.json({ ok: true });
+  } else {
+    res.status(404).json({ error: "Playlist not found" });
   }
 });
 
