@@ -1,0 +1,12 @@
+{"slots": [
+    { "style": "tango", "role": "classic" },
+    { "style": "tango", "role": "classic" },
+    { "style": "vals", "role": "classic" },
+    { "style": "tango", "role": "rich"},
+    { "style": "tango", "role": "rich" },
+    { "style": "milonga", "role": "classic" },
+    { "style": "tango", "role": "alt" },
+    { "style": "tango", "role": "alt" },
+    { "style": "vals", "role": "rich" }
+]
+}

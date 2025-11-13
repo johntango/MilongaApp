@@ -1,0 +1,311 @@
+{
+  "id": "3750fa3b9742",
+  "name": "arab tanda",
+  "createdAt": "2025-10-27T19:41:16.182Z",
+  "plan": {
+    "tandas": [
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 01 - Tierra Negra.mp3",
+            "title": "Tierra Negra",
+            "artist": "Carlos Di Sarli",
+            "BPM": 125.3,
+            "Energy": -16.05849266052246,
+            "Key": "G",
+            "camelotKey": "9B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 02 - Griseta.mp3",
+            "title": "Griseta",
+            "artist": "Carlos Di Sarli",
+            "BPM": 131.8,
+            "Energy": -16.93744468688965,
+            "Key": "F",
+            "camelotKey": "7B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 03 - Nido Gaucho.mp3",
+            "title": "Nido Gaucho",
+            "artist": "Carlos Di Sarli",
+            "BPM": 114.9,
+            "Energy": -16.657073974609375,
+            "Key": "Bb",
+            "camelotKey": "6B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 04 - Charlemos.mp3",
+            "title": "Charlemos",
+            "artist": "Carlos Di Sarli",
+            "BPM": 151.7,
+            "Energy": -16.86764907836914,
+            "Key": "C#m",
+            "camelotKey": "12A",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "title": "Cortina",
+        "streamId": null,
+        "approxMinutes": 1
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Pugliese/Serie De Oro Vol 2_ Osvaldo Pugliese/13 - La Mascota Del Barrio.mp3",
+            "title": "La Mascota Del Barrio",
+            "artist": "Osvaldo Pugliese",
+            "BPM": 134.2,
+            "Energy": -16.581104278564453,
+            "Key": "C#m",
+            "camelotKey": "12A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Pugliese/Grandes Del Tango 9/03 - Ventanita De Arrabal.mp3",
+            "title": "Ventanita De Arrabal",
+            "artist": "Osvaldo Pugliese",
+            "BPM": 132.3,
+            "Energy": -15.324666976928711,
+            "Key": "F#m",
+            "camelotKey": "11A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Pugliese/La Tupungatina/04 - Mala Junta.mp3",
+            "title": "Mala Junta",
+            "artist": "Osvaldo Pugliese",
+            "BPM": 134.8,
+            "Energy": -17.210674285888672,
+            "Key": "F#m",
+            "camelotKey": "11A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Pugliese/Tango Classics 1943-1946/21 - Mala Junta.mp3",
+            "title": "Mala Junta",
+            "artist": "Osvaldo Pugliese",
+            "BPM": 134.8,
+            "Energy": -17.210674285888672,
+            "Key": "F#m",
+            "camelotKey": "11A",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "title": "Cortina",
+        "streamId": null,
+        "approxMinutes": 1
+      },
+      {
+        "type": "tanda",
+        "style": "Vals",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 20 - Alfredo De Angelis 2/(Disc 2) 09 - Mi Cariñito.mp3",
+            "title": "Mi Cariñito",
+            "artist": "Alfredo de Angelis",
+            "BPM": 152.4,
+            "Energy": -16.507600784301758,
+            "Key": "A",
+            "camelotKey": "11B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/(Disc 2) 08 - Flores Del Alma.mp3",
+            "title": "Flores Del Alma",
+            "artist": "Alfredo de Angelis",
+            "BPM": 153.6,
+            "Energy": -16.06197166442871,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 20 - Alfredo De Angelis 2/(Disc 2) 05 - Mi Novia De Ayer.mp3",
+            "title": "Mi Novia De Ayer",
+            "artist": "Alfredo de Angelis",
+            "BPM": 142.5,
+            "Energy": -16.54019546508789,
+            "Key": "Bb",
+            "camelotKey": "6B",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "title": "Cortina",
+        "streamId": null,
+        "approxMinutes": 1
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Tangolar - The Bel Ami Of Turkish Tango/02 - Kalbimde Hiç Yerin Kalmadi (There's No Place For You In.mp3",
+            "title": "Kalbimde Hiç Yerin Kalmadi (There's No Place For You In My Heart)",
+            "artist": "Ibrahim Özgür",
+            "BPM": 131.9,
+            "Energy": -17.402698516845703,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Tangolar - The Bel Ami Of Turkish Tango/06 - Son Nefes (Last Breath).mp3",
+            "title": "Son Nefes (Last Breath)",
+            "artist": "Ibrahim Özgür",
+            "BPM": 112.9,
+            "Energy": -17.22531509399414,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Tangolar - The Bel Ami Of Turkish Tango/18 - Sönmedi Atesim (My Fever Has Not Died).mp3",
+            "title": "Sönmedi Atesim (My Fever Has Not Died)",
+            "artist": "Ibrahim Özgür",
+            "BPM": 155.7,
+            "Energy": -17.258953094482422,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Tangolar - The Bel Ami Of Turkish Tango/12 - Seviyordum Seni Ben (I Do Love You).mp3",
+            "title": "Seviyordum Seni Ben (I Do Love You)",
+            "artist": "Ibrahim Özgür",
+            "BPM": 117,
+            "Energy": -17.05034065246582,
+            "Key": "Dm",
+            "camelotKey": "7A",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "title": "Cortina",
+        "streamId": null,
+        "approxMinutes": 1
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/07 - Que Solo Estoy.mp3",
+            "title": "Que Solo Estoy",
+            "artist": "Carlos Di Sarli",
+            "BPM": 127,
+            "Energy": -16.94035530090332,
+            "Key": "Dm",
+            "camelotKey": "7A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Porteno y Bailarin/09 - Hoy al Recordarla.mp3",
+            "title": "Hoy al Recordarla",
+            "artist": "Carlos Di Sarli",
+            "BPM": 217.7,
+            "Energy": -17.038883209228516,
+            "Key": "Dm",
+            "camelotKey": "7A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Porteno y Bailarin/17 - Muriendome de Amor.mp3",
+            "title": "Muriendome de Amor",
+            "artist": "Carlos Di Sarli",
+            "BPM": 115.8,
+            "Energy": -16.671283721923828,
+            "Key": "Dm",
+            "camelotKey": "7A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Sus Primeros Exitos, Vol. 2/17 - Dejame.mp3",
+            "title": "Dejame",
+            "artist": "Carlos Di Sarli",
+            "BPM": 118.4,
+            "Energy": -17.280935287475586,
+            "Key": "Dm",
+            "camelotKey": "7A",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "title": "Cortina",
+        "streamId": null,
+        "approxMinutes": 1
+      },
+      {
+        "type": "tanda",
+        "style": "Milonga",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/(Disc 2) 07 - Apología Tanguera (Milonga).mp3",
+            "title": "Apología Tanguera (Milonga)",
+            "artist": "Ángel Vargas",
+            "BPM": 131,
+            "Energy": -16.82096290588379,
+            "Key": "Cm",
+            "camelotKey": "5A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/(Disc 2) 17 - Del Buenos Aires De Ayer (Milonga).mp3",
+            "title": "Del Buenos Aires De Ayer (Milonga)",
+            "artist": "Ángel Vargas",
+            "BPM": 149.7,
+            "Energy": -16.615428924560547,
+            "Key": "Am",
+            "camelotKey": "8A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/10 - Milonga Que Viene Al Tranco.mp3",
+            "title": "Milonga Que Viene Al Tranco",
+            "artist": "Ángel Vargas",
+            "BPM": 119.4,
+            "Energy": -16.828622817993164,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "seconds": 0
+          }
+        ]
+      }
+    ],
+    "totalMinutes": 71
+  },
+  "meta": {
+    "version": 1
+  }
+}

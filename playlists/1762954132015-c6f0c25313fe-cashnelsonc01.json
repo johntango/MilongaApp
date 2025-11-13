@@ -1,0 +1,430 @@
+{
+  "id": "c6f0c25313fe",
+  "name": "CashNelsonC01",
+  "createdAt": "2025-11-12T13:28:52.015Z",
+  "plan": {
+    "tandas": [
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "role": "classic",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 05 - Al Compás Del Corazón.mp3",
+            "title": "Al Compas del Corazon",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 135.1,
+            "Energy": -16.730066299438477,
+            "Key": "G",
+            "camelotKey": "9B",
+            "artUrl": "/album-art/sus-primeros-exitos-vol-3-carlos-di-sarli.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 15 - Sombras Del Puerto.mp3",
+            "title": "Sombras del Puerto",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 130.2,
+            "Energy": -16.07818603515625,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "artUrl": "/album-art/sus-primeros-exitos-vol-3-carlos-di-sarli.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Porteno y Bailarin/12 - Clavel del Aire.mp3",
+            "title": "Clavel del Aire",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 110.9,
+            "Energy": -16.67678451538086,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "artUrl": "/album-art/porteno-y-bailarin-carlos-di-sarli.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Porteno y Bailarin/11 - Tu Intimo Secreto.mp3",
+            "title": "Tu Intimo Secreto",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 131.8,
+            "Energy": -16.801136016845703,
+            "Key": "Bb",
+            "camelotKey": "6B",
+            "artUrl": "/album-art/porteno-y-bailarin-carlos-di-sarli.jpg",
+            "year": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Willie Nelson/16 Biggest Hits Willie Nelson/Johnny Cash & Willie Nelson - Always on My Mind.mp3",
+            "title": "Always on My Mind",
+            "artist": "Johnny Cash & Willie Nelson",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Willie Nelson/16 Biggest Hits Willie Nelson/Johnny Cash & Willie Nelson - Always on My Mind.mp3",
+        "artist": "Johnny Cash & Willie Nelson",
+        "singer": null,
+        "title": "Always on My Mind"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "role": "classic",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/03 Pasta Ancha.mp3",
+            "title": "Pasta Ancha",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 127.5,
+            "Energy": -17.347200393676758,
+            "Key": "Am",
+            "camelotKey": "8A",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/09 Nagracha.mp3",
+            "title": "Nagracha",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 140.4,
+            "Energy": -17.459877014160156,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/10 El Andariego.mp3",
+            "title": "El Andariego",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 117.1,
+            "Energy": -16.93684196472168,
+            "Key": "D",
+            "camelotKey": "10B",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/05 Ilusion De Mi Vida.mp3",
+            "title": "Ilusion De Mi Vida",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 145,
+            "Energy": -17.506805419921875,
+            "Key": "A",
+            "camelotKey": "11B",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Various Artists/The British Invasion- History of British Rock, Vol. 2/The British Invasion- History of British Rock, Vol. 2 10 I Don't Want to See You Again.mp3",
+            "title": "I Don't Want to See You Again",
+            "artist": "Peter & Gordon",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Various Artists/The British Invasion- History of British Rock, Vol. 2/The British Invasion- History of British Rock, Vol. 2 10 I Don't Want to See You Again.mp3",
+        "artist": "Peter & Gordon",
+        "singer": null,
+        "title": "I Don't Want to See You Again"
+      },
+      {
+        "type": "tanda",
+        "orchestra": "Alfredo de Angelis",
+        "style": "Vals",
+        "tracks": [
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL2RlIEFuZ2VsaXMvR3JhbmRlcyBEZWwgVGFuZ28gMTEvKERpc2MgMikgMDggLSBGbG9yZXMgRGVsIEFsbWEubXAz",
+            "title": "Flores Del Alma",
+            "artist": "Alfredo de Angelis",
+            "album": "Grandes Del Tango 11",
+            "BPM": 153.6,
+            "Energy": -16.06197166442871,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/(Disc 2) 08 - Flores Del Alma.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL2RlIEFuZ2VsaXMvR3JhbmRlcyBEZWwgVGFuZ28gMjAgLSBBbGZyZWRvIERlIEFuZ2VsaXMgMi8oRGlzYyAyKSAwNSAtIE1pIE5vdmlhIERlIEF5ZXIubXAz",
+            "title": "Mi Novia De Ayer",
+            "artist": "Alfredo de Angelis",
+            "album": "Grandes Del Tango 20 - Alfredo De Angelis 2",
+            "BPM": 142.5,
+            "Energy": -16.54019546508789,
+            "Key": "Bb",
+            "camelotKey": "6B",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 20 - Alfredo De Angelis 2/(Disc 2) 05 - Mi Novia De Ayer.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL2RlIEFuZ2VsaXMvR3JhbmRlcyBEZWwgVGFuZ28gMjAgLSBBbGZyZWRvIERlIEFuZ2VsaXMgMi8oRGlzYyAyKSAwOSAtIE1pIENhcmluzINpdG8ubXAz",
+            "title": "Mi Cariñito",
+            "artist": "Alfredo de Angelis",
+            "album": "Grandes Del Tango 20 - Alfredo De Angelis 2",
+            "BPM": 152.4,
+            "Energy": -16.507600784301758,
+            "Key": "A",
+            "camelotKey": "11B",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 20 - Alfredo De Angelis 2/(Disc 2) 09 - Mi Cariñito.mp3",
+            "seconds": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 18 Play with Fire.mp3",
+            "title": "Play with Fire",
+            "artist": "The Rolling Stones",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 18 Play with Fire.mp3",
+        "artist": "The Rolling Stones",
+        "singer": null,
+        "title": "Play with Fire"
+      },
+      {
+        "type": "tanda",
+        "orchestra": "Alfredo de Angelis O.T. con Oscar Larroca",
+        "style": "Tango",
+        "tracks": [
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsZnJlZG8gZGUgQW5nZWxpcy9Db21vIG5vcyBjYW1iaWEgbGEgdmlkYS8wMSAtIENvbW8gbm9zIGNhbWJpYSBsYSB2aWRhLm1wMw",
+            "title": "Como nos cambia la vida",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 146.5,
+            "Energy": -17.010061264038086,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/01 - Como nos cambia la vida.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsZnJlZG8gZGUgQW5nZWxpcy9Db21vIG5vcyBjYW1iaWEgbGEgdmlkYS8wMyAtIEJhaWxhcmluIGNvbXBhZHJpdG8ubXAz",
+            "title": "Bailarin compadrito",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 144.8,
+            "Energy": -17.25041389465332,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/03 - Bailarin compadrito.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsZnJlZG8gZGUgQW5nZWxpcy9Db21vIG5vcyBjYW1iaWEgbGEgdmlkYS8wOSAtIEVuIHR1cyBicmF6b3MubXAz",
+            "title": "En tus brazos",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 125,
+            "Energy": -16.720340728759766,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/09 - En tus brazos.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsZnJlZG8gZGUgQW5nZWxpcy9Db21vIG5vcyBjYW1iaWEgbGEgdmlkYS8wMiAtIE1lZGFsbGl0YSBkZSBsYSBzdWVydGUubXAz",
+            "title": "Medallita de la suerte",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 142.9,
+            "Energy": -16.843475341796875,
+            "Key": "A",
+            "camelotKey": "11B",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/02 - Medallita de la suerte.mp3",
+            "seconds": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 2/(Disc 2) 13 - Born To Boogie.mp3",
+            "title": "Born To Boogie",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 2/(Disc 2) 13 - Born To Boogie.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Born To Boogie"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "role": "modern",
+        "size": 4,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/03 - Bailarin compadrito.mp3",
+            "title": "Bailarin compadrito",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 144.8,
+            "Energy": -17.25041389465332,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/01 - Como nos cambia la vida.mp3",
+            "title": "Como nos cambia la vida",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 146.5,
+            "Energy": -17.010061264038086,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/06 - Por que me das dique_.mp3",
+            "title": "Por que me das dique?",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 146.9,
+            "Energy": -16.773174285888672,
+            "Key": "Cm",
+            "camelotKey": "5A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/09 - Besame En La Boca.mp3",
+            "title": "Besame En La Boca",
+            "artist": "Alfredo de Angelis",
+            "album": "Grandes Del Tango 11",
+            "BPM": 149.4,
+            "Energy": -16.713041305541992,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 05 - Finders Are Keepers.mp3",
+            "title": "Finders Are Keepers",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 05 - Finders Are Keepers.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Finders Are Keepers"
+      },
+      {
+        "type": "tanda",
+        "style": "Milonga",
+        "role": "alt",
+        "size": 3,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/12 Tremolina.mp3",
+            "title": "Tremolina",
+            "artist": "Color Tango",
+            "album": "Con estilo para bailar, volumen 1",
+            "BPM": 113.9,
+            "Energy": -17.05388069152832,
+            "Key": "D",
+            "camelotKey": "10B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Milonga Vieja Milonga/01-02- El portenito.mp3",
+            "title": "El portenito",
+            "artist": "Angel D`Agostino Y Su Orquesta Tipica (Singer: Angel Vargas)",
+            "album": "Milonga Vieja Milonga",
+            "BPM": 145,
+            "Energy": -16.59906578063965,
+            "Key": "D",
+            "camelotKey": "10B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/(Disc 2) 17 - Del Buenos Aires De Ayer (Milonga).mp3",
+            "title": "Del Buenos Aires De Ayer (Milonga)",
+            "artist": "Ángel Vargas",
+            "album": "Grandes Del Tango 30 - Ángel Vargas 2",
+            "BPM": 149.7,
+            "Energy": -16.615428924560547,
+            "Key": "Am",
+            "camelotKey": "8A",
+            "seconds": 0
+          }
+        ]
+      }
+    ],
+    "totalMinutes": 71
+  },
+  "meta": {
+    "version": 1
+  }
+}

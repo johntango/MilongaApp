@@ -1,0 +1,21 @@
+{
+  "name": "milonga-app",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@openai/agents": "^0.1.9",
+    "@openai/agents-openai": "^0.1.9",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "fs": "^0.0.1-security",
+    "morgan": "^1.10.0",
+    "music-metadata": "^11.9.0",
+    "openai": "^6.3.0",
+    "path": "^0.12.7",
+    "zod": "^3.25.76"
+  }
+}

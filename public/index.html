@@ -1,0 +1,2551 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Milonga Planner (SPA)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Milonga Planner (T-T-V-T-T-M)</h1>
+      <div class="controls">
+        <input id="pl-name" placeholder="Playlist name…" style="width: 220px" />
+
+        <button id="pl-save">Save</button>
+        <select id="pl-list">
+          <option value="">— saved playlists —</option>
+        </select>
+        <button id="pl-refresh">Refresh</button>
+        <button id="pl-load">Load</button>
+        <button id="pl-delete" title="Delete selected playlist">Delete</button>
+
+        <div class="separator">|</div>
+        <label class="muted">Tanda Library:</label>
+        <select id="tanda-list">
+          <option value="">— saved tandas —</option>
+        </select>
+        <button id="tanda-refresh" title="Refresh tanda library">🔄</button>
+        <button id="tanda-delete" title="Delete selected tanda">🗑️</button>
+
+        <label class="muted">Target:</label>
+        <select id="minutes">
+          <option value="180" selected>180 min</option>
+          <option value="150">150 min</option>
+          <option value="210">210 min</option>
+        </select>
+        <label for="scheduleSelect">Tanda Styles:</label>
+        <select id="scheduleSelect" value="tandaScheduleClassic.json">
+          <option value="tandaScheduleStandard.json">Standard</option>
+          <option value="tandaScheduleClassic.json">Classic</option>
+          <option value="tandaScheduleModern.json">Modern</option>
+          <option value="tandaScheduleRich.json">Rich</option>
+        </select>
+        <ul id="tandas"></ul>
+        <div id="summary"></div>
+        <button id="tanda-gen">Generate Tandas (stream)</button>
+        <button id="genplan">Agent Bulk Generator</button>
+        <button id="review">Agent Review</button>
+        <button id="swap">Swap</button>
+        <button id="next">Next Track</button>
+        <button id="pause">Play/Pause</button>
+      </div>
+      <label class="muted">Tango genre:</label>
+      <select id="tango-genre">
+        <option value="auto" selected>Auto (neighbor)</option>
+        <option value="tango-genre">Tango</option>
+        <option value="vieja">Vieja</option>
+        <option value="nueva">Nueva</option>
+        <option value="golden">Golden</option>
+        <option value="renaissence">Renaisence</option>
+      </select>
+      <label class="muted">Cortina genre:</label>
+      <select id="cortina-genre">
+        <option value="auto" selected>Auto (neighbor)</option>
+        <option value="jazz">Jazz</option>
+        <option value="rock">Rock</option>
+        <option value="country">Country</option>
+        <option value="blues">Blues</option>
+      </select>
+    </header>
+    <span id="status-badge" class="badge" title="Background activity"
+      >Idle</span
+    >
+    <div class="page">
+      <div class="panel">
+        <div class="row"><strong>Now Playing</strong></div>
+        <div id="now" class="muted">–</div>
+        <div class="space"></div>
+        <audio id="player" controls preload="none"></audio>
+        <div class="space"></div>
+        <div class="grid2">
+          <div>
+            <small class="muted">Elapsed</small>
+            <div id="elapsed">0:00</div>
+          </div>
+          <div>
+            <small class="muted">Remaining</small>
+            <div id="remaining">0:00</div>
+          </div>
+        </div>
+        <div class="space"></div>
+        <div class="footer">
+          <small class="muted">End by:</small>
+          <div id="eta" class="muted">–</div>
+        </div>
+        <div class="row">
+          <strong>Activity</strong>
+          <button class="tiny" id="log-clear">Clear</button>
+        </div>
+        <div id="activity-log" class="log"></div>
+
+        <div class="space"></div>
+        <div class="row">
+          <strong>LLM Transcript</strong>
+          <button class="tiny" id="llm-clear">Clear</button>
+        </div>
+        <pre id="llm-transcript" class="log llm"></pre>
+      </div>
+
+      <div class="panel">
+        <div class="row">
+          <strong>Plan</strong><span id="total" class="muted"></span>
+        </div>
+        <div id="timeline" class="timeline"></div>
+      </div>
+    </div>
+
+    <script>
+      // ---------- DOM helpers ----------
+      const $ = (sel) => document.querySelector(sel);
+      const timelineEl = $("#timeline");
+      const player = $("#player");
+      const nowEl = $("#now");
+      const totalEl = $("#total");
+      const elapsedEl = $("#elapsed");
+      const remainingEl = $("#remaining");
+      const etaEl = $("#eta");
+      const tandasListEl = $("#tandas");
+      const summaryEl = $("#summary");
+      const cortinaGenreSel = $("#cortina-genre");
+      const tangoGenreSel = $("#tango-genre");
+
+      let PLAN = null; // current plan { tandas: [...] }
+      let curIdx = -1; // index into plan.tandas[*]
+      let curTrackOffset = 0;
+      let swapFirst = null;
+
+      let viewerWin = null;
+
+      // Track current replacement session to avoid repetition within the same replacement attempt
+      let currentReplacementSession = null; // { tandaIndex, trackIndex, attempted: Set() }
+
+      function clearReplacementHistory() {
+        currentReplacementSession = null;
+        console.log("[REPLACEMENT] Session cleared for new plan");
+      }
+
+      function clearReplacementSession() {
+        if (currentReplacementSession) {
+          console.log(
+            `[REPLACEMENT] Manually clearing session for ${currentReplacementSession.tandaIndex}:${currentReplacementSession.trackIndex}`
+          );
+          currentReplacementSession = null;
+        }
+      }
+
+      function getReplacementSession(tandaIndex, trackIndex) {
+        // If this is a different position than the current session, start fresh
+        if (
+          !currentReplacementSession ||
+          currentReplacementSession.tandaIndex !== tandaIndex ||
+          currentReplacementSession.trackIndex !== trackIndex
+        ) {
+          if (currentReplacementSession) {
+            console.log(
+              `[REPLACEMENT] Switching from session ${currentReplacementSession.tandaIndex}:${currentReplacementSession.trackIndex} (${currentReplacementSession.attempted.size} attempted) to ${tandaIndex}:${trackIndex}`
+            );
+          } else {
+            console.log(
+              `[REPLACEMENT] Starting new session for ${tandaIndex}:${trackIndex}`
+            );
+          }
+
+          currentReplacementSession = {
+            tandaIndex,
+            trackIndex,
+            attempted: new Set(),
+          };
+        }
+        return currentReplacementSession;
+      }
+      // load all tracks from catalog-Art.json
+      fetch("/api/catalog/full")
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch full catalog");
+          return res.json();
+        })
+        .then((data) => {
+          window.catalogArt = { tracks: data };
+          console.log("Loaded full catalog:", data.length, "tracks");
+        })
+        .catch((err) => {
+          console.error("Error loading catalog from API:", err);
+        });
+
+      const state = { loadedScheduleSlots: null };
+
+      document
+        .getElementById("scheduleSelect")
+        .addEventListener("change", async (e) => {
+          state.loadedScheduleSlots = null;
+          const url = `schedules/${e.target.value}`;
+          if (!url) return;
+
+          const data = await (await fetch(url)).json();
+          // Accept two shapes:
+          // 1) { tandas: [{hour, tandaIndex, role}, ...] }  -> you still need styles from the pattern UI
+          // 2) { slots:  [{style, role}, ...] }            -> fully unified
+          if (Array.isArray(data?.slots)) {
+            state.loadedScheduleSlots = data.slots; // unified
+          } else if (Array.isArray(data?.tandas)) {
+            // Map {hour, tandaIndex, role} onto current pattern list
+            const pattern = getPatternFromUI();
+            state.loadedScheduleSlots = data.tandas.map((t, i) => ({
+              style: pattern[i] || "Tango",
+              role: t.role || DEFAULT_ROLE,
+            }));
+          }
+        });
+
+      // Default if a role is omitted
+      const DEFAULT_ROLE = "classic";
+      function logAgent(line) {
+        const el = document.getElementById("agentLog");
+        if (!el) return;
+        el.textContent += line + "\n";
+        el.scrollTop = el.scrollHeight;
+      }
+      function fmt(obj) {
+        try {
+          return JSON.stringify(obj, null, 2);
+        } catch {
+          return String(obj);
+        }
+      }
+      function normalizeSlots({
+        pattern,
+        schedule,
+        defaultRole = DEFAULT_ROLE,
+      }) {
+        // Case A: already unified
+        if (
+          Array.isArray(pattern) &&
+          pattern.every((s) => s && typeof s === "object" && s.style)
+        ) {
+          return pattern.map((s) => ({
+            style: s.style,
+            role: s.role || defaultRole,
+          }));
+        }
+        // Case B: legacy pattern + optional schedule[]
+        if (
+          Array.isArray(pattern) &&
+          pattern.every((s) => typeof s === "string")
+        ) {
+          const roles = Array.isArray(schedule) ? schedule : [];
+          return pattern.map((style, i) => ({
+            style,
+            role: roles[i] || defaultRole,
+          }));
+        }
+        throw new Error(
+          "Invalid pattern/schedule; expected array or unified slots."
+        );
+      }
+      function effectiveCortinaGenreFor(ti, blk) {
+        const sel = (cortinaGenreSel?.value || "auto").toLowerCase();
+        if (sel !== "auto") return sel; // DJ-picked genre wins
+        return deriveCortinaGenre(blk, ti); // your existing inference
+      }
+
+      function effectiveTangoGenreFor(ti, blk) {
+        const sel = (tangoGenreSel?.value || "auto").toLowerCase();
+        if (sel !== "auto") return sel; // DJ-picked genre wins
+        return deriveTangoGenre(blk, ti); // your existing inference
+      }
+      window.addEventListener("load", () => {
+        document.getElementById("scheduleSelect").value =
+          "tandaScheduleClassic.json";
+        document
+          .getElementById("scheduleSelect")
+          .dispatchEvent(new Event("change"));
+      });
+
+      function deriveCortinaGenre(blk, ti) {
+        // 1) explicit fields if present
+        const explicit =
+          blk.genre || blk.cortinaGenre || blk.tags?.genre || blk.styleTag;
+        if (explicit && typeof explicit === "string")
+          return explicit.trim().toLowerCase();
+
+        // 2) infer from neighbor tanda style (common in milonga programming)
+        const left = PLAN?.tandas?.[ti - 1];
+        const right = PLAN?.tandas?.[ti + 1];
+        const style = (left?.style || right?.style || "").toLowerCase(); // "tango" | "vals" | "milonga" | ...
+        if (style) return style;
+
+        // 3) fallback
+        return "default";
+      }
+
+      function energyOf(t) {
+        return t?.tags?.Energy ?? t?.Energy ?? t?.audio?.energy ?? null;
+      }
+      function getAbsolutePath(file) {
+        if (!file) return null;
+        return file.absPath || file.id || file.path || file.fullPath || null;
+      }
+      function getBPM(x) {
+        // accept object-level or nested tags/audio; prefer explicit BPM over tempoBPM
+        const cands = [
+          x?.BPM,
+          x?.bpm,
+          x?.tempoBPM,
+          x?.tags?.BPM,
+          x?.tags?.tempoBPM,
+          x?.audio?.bpm,
+        ];
+        for (const v of cands) {
+          const n = Number.parseFloat(v);
+          if (Number.isFinite(n)) return Math.round(n * 10) / 10;
+        }
+        return null;
+      }
+      function bpmOf(t) {
+        return getBPM(t);
+      } // keep old name if referenced elsewhere
+
+      function isCortinaBlock(blk) {
+        if (!blk) return false;
+        const style = (blk.style || "").toLowerCase();
+        return (
+          blk.type === "cortina" ||
+          style === "cortina" ||
+          (blk.size === 1 &&
+            style !== "tango" &&
+            style !== "vals" &&
+            style !== "milonga")
+        );
+      }
+      // Unified row-click handler: plays tanda tracks and cortinas
+      // Unified row-click handler: plays tanda tracks and cortinas
+      timelineEl.addEventListener("click", (e) => {
+        // Let dedicated button handlers take over if a control was clicked
+        if (e.target.closest(".delete-track, .delete-cortina")) return;
+
+        const row = e.target.closest(".track");
+        if (!row) return;
+
+        const ti = Number(row.dataset.tandaIndex);
+        if (!Number.isFinite(ti)) return;
+
+        // Cortina row behaves like a single-track tanda
+        if (row.classList.contains("cortina-track")) {
+          curTrackOffset = 0;
+          playBlock(ti);
+          return;
+        }
+
+        // Regular tanda row
+        const ki = Number(row.dataset.trackIndex);
+        if (!Number.isFinite(ki)) return;
+        playSpecific(ti, ki);
+      });
+
+      document
+        .getElementById("scheduleSelect")
+        .addEventListener("change", (e) => {
+          const selectedFile = e.target.value;
+          fetch(`/schedules/${selectedFile}`)
+            .then((res) => res.json())
+            .then((schedule) => {
+              console.log("Loaded tanda schedule:", schedule);
+              buildPlanFromSchedule(schedule.tandas);
+            })
+            .catch((err) => {
+              console.error("Failed to load schedule:", err);
+            });
+        });
+
+      const DEFAULT_SIZES = { Tango: 4, Vals: 3, Milonga: 3 };
+
+      /** Normalize a single slot record */
+      function normalizeSlot(s) {
+        const style = String(s.style || "").trim();
+        const role = String(s.role || "").trim() || null;
+        const size = Number.isFinite(s.size) ? s.size : null;
+        if (!style) return null;
+        return { style, role, size };
+      }
+
+      /** Build slots from legacy arrays (if still present) */
+      function slotsFromLegacy(patternArr, scheduleArr) {
+        const out = [];
+        const N = Array.isArray(patternArr) ? patternArr.length : 0;
+        for (let i = 0; i < N; i++) {
+          const style = String(patternArr[i] || "").trim();
+          if (!style) continue;
+          const role = Array.isArray(scheduleArr)
+            ? scheduleArr[i] || null
+            : null;
+          out.push({ style, role, size: null });
+        }
+        return out;
+      }
+
+      /** Parse schedule JSON from file.
+       * Accepts:
+       *  A) { slots: [{style, role, size?}, ...] }
+       *  B) { pattern: [...], tandas: [{tandaIndex, role, ...}, ...] }
+       */
+      function parseScheduleJSON(json) {
+        if (!json || typeof json !== "object") return [];
+
+        // A) Already in slots form
+        if (Array.isArray(json.slots) && json.slots.length) {
+          return json.slots.map(normalizeSlot).filter(Boolean);
+        }
+
+        // B) pattern + tandas (role per index)
+        if (Array.isArray(json.pattern) && Array.isArray(json.tandas)) {
+          const roleByIndex = new Map();
+          for (const t of json.tandas) {
+            if (t && Number.isFinite(t.tandaIndex)) {
+              roleByIndex.set(t.tandaIndex, (t.role ?? "").trim() || null);
+            }
+          }
+          const slots = json.pattern.map((style, i) => ({
+            style: String(style || "").trim(),
+            role: roleByIndex.get(i) || null,
+            size: null,
+          }));
+          return slots.filter((s) => s.style);
+        }
+
+        // C) Only pattern (no roles)
+        if (Array.isArray(json.pattern) && json.pattern.length) {
+          return json.pattern
+            .map((style) => ({
+              style: String(style || "").trim(),
+              role: null,
+              size: null,
+            }))
+            .filter((s) => s.style);
+        }
+
+        return [];
+      }
+
+      /** Merge default sizes into slots (slot.size wins if present) */
+      function applySizes(slots, defaultSizes = DEFAULT_SIZES) {
+        return slots.map((s) => ({
+          ...s,
+          size: Number.isFinite(s.size) ? s.size : defaultSizes[s.style] ?? 3,
+        }));
+      }
+
+      /** MAIN: read slots from a UI <select> or from legacy globals.
+       * Returns: { slots, sizes }
+       */
+      async function readSlotsFromUIorFile({
+        scheduleSelectId = "scheduleSelect",
+        schedulesBasePath = "/schedules", // change if your files live elsewhere
+        defaultSizes = DEFAULT_SIZES,
+      } = {}) {
+        // 1) If a schedule file is chosen, load & parse it.
+        const sel = document.getElementById(scheduleSelectId);
+        const fileName = sel && sel.value ? String(sel.value).trim() : "";
+
+        if (fileName) {
+          const url = `${schedulesBasePath}/${fileName}`;
+          const res = await fetch(url, { cache: "no-store" });
+          if (!res.ok) throw new Error(`Failed to load schedule file: ${url}`);
+          const json = await res.json();
+          const slotsParsed = parseScheduleJSON(json);
+          const slots = applySizes(slotsParsed, defaultSizes);
+          return { slots, sizes: defaultSizes };
+        }
+
+        // 2) Fallbacks:
+        //    a) if the page still exposes legacy arrays
+        if (Array.isArray(window.PATTERN)) {
+          const legacySlots = slotsFromLegacy(window.PATTERN, window.SCHEDULE);
+          const slots = applySizes(legacySlots, defaultSizes);
+          return { slots, sizes: defaultSizes };
+        }
+
+        //    b) last-resort default: 6-slot classic
+        const fallback = [
+          { style: "Tango", role: "classic" },
+          { style: "Tango", role: "classic" },
+          { style: "Vals", role: "classic" },
+          { style: "Tango", role: "classic" },
+          { style: "Tango", role: "classic" },
+          { style: "Milonga", role: "classic" },
+        ];
+        const slots = applySizes(fallback, defaultSizes);
+        return { slots, sizes: defaultSizes };
+      }
+      async function buildGenerateBody() {
+        const minutes = Number(getMinutesFromUI() || 180);
+
+        // Read legacy UI controls (if you still show them)
+        const pattern = getPatternFromUI(); // e.g., ["Tango","Tango","Vals", ...]
+        const schedule = getScheduleRolesFromUI(); // e.g., ["classic","classic","rich", ...] or null
+
+        // Or read a pre-baked unified slots list from a schedule file you loaded:
+        // const preBakedSlots = state.loadedScheduleSlots || null;
+
+        const sizes = {
+          Tango: Number(getSize("Tango") || 4),
+          Vals: Number(getSize("Vals") || 3),
+          Milonga: Number(getSize("Milonga") || 3),
+        };
+
+        // Prefer unified if provided; otherwise normalize legacy
+        const slots = state.loadedScheduleSlots
+          ? normalizeSlots({ pattern: state.loadedScheduleSlots })
+          : normalizeSlots({ pattern, schedule });
+
+        // keep backward compat for server that still reads 'pattern' (optional):
+        return {
+          minutes,
+          sizes,
+          catalog: window.catalogArt, // you already populate this
+          slots, // ← NEW canonical field
+          // pattern, schedule           // (optional) send if server still expects legacy
+        };
+      }
+
+      async function startStreamingPlan() {
+        const body = await buildGenerateBody();
+
+        const res = await fetch("/api/agent/generate/ndjson", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        // existing NDJSON reader stays the same
+        readNdjson(res, onNdjsonEvent);
+      }
+      const orchestraByRole = {
+        classic: [
+          { name: "Juan D'Arienzo", era: [1935, 1945] },
+          { name: "Rodolfo Biagi", era: [1938, 1944] },
+          { name: "Alfredo De Angelis", era: [1940, 1952] },
+        ],
+        rich: [
+          { name: "Anibal Troilo", era: [1940, 1955] },
+          { name: "Ricardo Tanturi", era: [1940, 1950] },
+          { name: "Carlos Di Sarli", era: [1940, 1958] },
+        ],
+        modern: [
+          { name: "Osvaldo Pugliese", era: [1950, 1970] },
+          { name: "Color Tango", era: [1990, 2010] },
+          { name: "Sexteto Milonguero", era: [2005, 2020] },
+        ],
+        alt: [
+          { name: "Otros Aires", era: [2005, 2020] },
+          { name: "Tanghetto", era: [2005, 2020] },
+          { name: "Bajofondo", era: [2002, 2015] },
+        ],
+      };
+      function scoreTrackByRole(track, role, tandaSoFar = []) {
+        const year = track.tags?.year ?? 0;
+        const artist = (track.tags?.artist || "").toLowerCase();
+
+        const pool = orchestraByRole[role] || [];
+        let score = 0;
+
+        for (const entry of pool) {
+          const nameMatch = artist.includes(entry.name.toLowerCase());
+          const yearMatch = year >= entry.era[0] && year <= entry.era[1];
+
+          if (nameMatch && yearMatch) {
+            score += 60;
+          } else if (nameMatch) {
+            score += 30;
+          } else if (yearMatch) {
+            score += 20;
+          }
+        }
+
+        // Penalize repetition within tanda
+        if (
+          tandaSoFar.some(
+            (t) => (t.tags?.artist || "").toLowerCase() === artist
+          )
+        ) {
+          score -= 40;
+        }
+
+        return score;
+      }
+      async function runAgentNDJSON(payload) {
+        // payload should include { minutes, catalog, pattern, sizes, tandaScheduleName? / tandaSchedule? }
+        logAgent("▶ starting agent…");
+
+        const res = await fetch("/api/agent/generate/ndjson", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok || !res.body) {
+          logAgent(`✖ HTTP ${res.status} ${res.statusText}`);
+          return;
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = "";
+
+        try {
+          for (;;) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+
+            // process complete lines
+            let idx;
+            while ((idx = buf.indexOf("\n")) >= 0) {
+              const line = buf.slice(0, idx).trim();
+              buf = buf.slice(idx + 1);
+              if (!line) continue;
+
+              let msg;
+              try {
+                msg = JSON.parse(line);
+              } catch {
+                logAgent(`(raw) ${line}`);
+                continue;
+              }
+
+              // Pretty-print a concise line per message type
+              switch (msg.type) {
+                case "start":
+                  logAgent(
+                    `• start  minutes=${msg.minutes}  pattern=[${(
+                      msg.pattern || []
+                    ).join(", ")}]`
+                  );
+                  break;
+                case "tanda":
+                  logAgent(
+                    `• tanda #${msg.index}  style=${msg.tanda?.style}  tracks=${msg.tanda?.tracks?.length}  remainingSec=${msg.remainingSeconds}`
+                  );
+                  // optional: also update your existing PLAN UI if you want live insertion
+                  // insertTandaIntoPlanUI(msg.tanda);  // your existing function
+                  break;
+                case "summary":
+                  logAgent(`• summary: ${fmt(msg.summary)}`);
+                  break;
+                case "done":
+                  logAgent("✓ done");
+                  // you likely already render plan/timeline; wire it here:
+                  // renderPlan(msg.plan); renderTimeline(msg.display.timeline);
+                  break;
+                case "error":
+                  logAgent(`✖ error: ${msg.error}`);
+                  break;
+                default:
+                  logAgent(`• ${msg.type || "event"}: ${fmt(msg)}`);
+              }
+            }
+          }
+        } catch (e) {
+          logAgent(`✖ stream error: ${e?.message || e}`);
+        } finally {
+          // flush any trailing partial
+          const rest = buf.trim();
+          if (rest) logAgent(rest);
+        }
+      }
+
+      function buildTanda(catalog, role, length = 4) {
+        const tanda = [];
+        for (let i = 0; i < length; i++) {
+          const candidates = catalog.tracks
+            .map((track) => ({
+              track,
+              score: scoreTrackByRole(track, role, tanda),
+            }))
+            .sort((a, b) => b.score - a.score)
+            .map((entry) => entry.track);
+
+          const selected = candidates.find((c) => !tanda.includes(c));
+          if (selected) tanda.push(selected);
+        }
+        return tanda;
+      }
+
+      function buildMilongaSchedule(catalog) {
+        const schedule = tandaSchedule.map((entry) => ({
+          ...entry,
+          tanda: buildTanda(catalog, entry.role),
+        }));
+        return {
+          tandas: schedule.map((e) => ({ style: "Tango", tracks: e.tanda })),
+        };
+      }
+
+      function buildPlanFromSchedule(tandaSchedule) {
+        if (!window.catalogArt || !window.catalogArt.tracks) {
+          console.warn("Catalog not yet loaded.");
+          return;
+        }
+        async function requestReplacement({
+          style,
+          orchestra,
+          position,
+          neighbors,
+          avoidIds,
+          topK = 6,
+          homogenize = false,
+        }) {
+          const body = {
+            catalog: window.catalogArt, // <- the *full* catalog you loaded from /catalog-Art.json or /api/catalog/full
+            style,
+            orchestra: orchestra || null,
+            position, // { tandaIndex, trackIndex }
+            neighbors, // { prev: { id, BPM, Energy, camelotKey }, next: {...} }
+            avoidIds, // array of currently used track ids in this tanda
+            topK,
+            homogenize,
+          };
+
+          const r = await fetch("/api/agent/replace", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+
+          if (!r.ok) {
+            const err = await r.json().catch(() => ({}));
+            throw new Error(err?.error || r.statusText);
+          }
+          return r.json();
+        }
+        const catalog = window.catalogArt;
+        const tandas = tandaSchedule.map((entry, i) => {
+          const tracks = buildTanda(catalog, entry.role, 4); // or 3, 5, etc.
+          return { style: "Tango", tracks }; // Adjust style if needed
+        });
+
+        window.PLAN = { tandas };
+        renderPlan(); // whatever method you're using to render PLAN into UI
+      }
+
+      // event listener for song delete
+      timelineEl.addEventListener("click", async (e) => {
+        const homogenize = e.shiftKey === true;
+        const del = e.target.closest(".delete-track");
+        if (!del) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Ensure we have a catalog for the backend to match against
+        if (!window.currentCatalog?.tracks?.length) {
+          await prepareCatalog(); // your existing function; sets window.currentCatalog
+        }
+
+        const ti = Number(del.dataset.tandaIndex);
+        const ki = Number(del.dataset.trackIndex);
+        if (!Number.isFinite(ti) || !Number.isFinite(ki) || !PLAN) return;
+
+        const tanda = PLAN.tandas[ti];
+        if (!tanda) return;
+
+        // Build context for the agent
+        const style = tanda.style;
+        const removed = tanda.tracks[ki];
+        const orchestra = (removed?.artist || "").trim() || null;
+
+        const neighbor = (d) => {
+          const tr = tanda.tracks[ki + d];
+          return tr
+            ? {
+                id: tr.id,
+                bpm: tr.BPM ?? null,
+                energy: tr.Energy ?? null,
+                key: tr.camelotKey ?? tr.Key ?? null,
+                artist: tr.artist ?? null,
+                seconds: tr.seconds ?? null,
+              }
+            : null;
+        };
+
+        const payload = {
+          catalog: window.currentCatalog, // MUST be present
+          style,
+          orchestra, // prefer to keep same orchestra
+          position: { tandaIndex: ti, trackIndex: ki },
+          neighbors: { prev: neighbor(-1), next: neighbor(+1) },
+          avoidIds: tanda.tracks
+            .map((t) => t.id)
+            .filter((id, idx) => idx !== ki), // avoid other tracks in this tanda (but not the one being replaced)
+          topK: 6, // ask server to propose up to 6 options
+          homogenize,
+        };
+
+        // Optimistic UI: grey out row while replacing
+        const card = document.querySelector(`.card[data-index="${ti}"]`);
+        const row = card?.querySelector(`.track[data-track-index="${ki}"]`);
+        if (row) row.style.opacity = 0.5;
+
+        try {
+          const res = await fetch("/api/agent/replace", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Replacement failed");
+
+          // Replace in PLAN and re-render only this tanda
+          const repl = data.replacement; // {id,title,artist,...}
+          if (!repl?.id) throw new Error("No replacement track returned");
+
+          tanda.tracks.splice(ki, 1, repl);
+          // Optional: re-compute approxMinutes for this tanda (if you keep it)
+          if (typeof repl.seconds === "number") {
+            const secs = tanda.tracks.reduce((s, t) => s + (t.seconds || 0), 0);
+            tanda.approxMinutes = Math.max(1, Math.round(secs / 60));
+          }
+          renderTandaCard(ti); // re-render only this card (helper below)
+        } catch (err) {
+          console.error(err);
+          alert(err.message || String(err));
+          if (row) row.style.opacity = 1;
+        }
+      });
+      // --- Cortina replace (single handler; uses replaceCortinaAt) ---
+      timelineEl.addEventListener("click", async (e) => {
+        const btn = e.target.closest(".delete-cortina");
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const ti = Number(btn.dataset.index);
+        if (!Number.isFinite(ti) || !PLAN) return;
+
+        const blk = PLAN.tandas[ti];
+        if (!isCortinaBlock(blk)) return;
+        // ➊ Resolve genre from selector (or infer if "auto")
+        const cortinagenre = effectiveCortinaGenreFor(ti, blk);
+        // ➋ Ensure the pool for this genre is fetched on first use
+
+        // ➌ Draw the next item from that genre’s pool
+        const currentId = blk.streamId || blk?.tracks?.[0]?.id || null;
+        const repl = nextCortina(currentId, cortinagenre);
+
+        if (!repl) {
+          alert("No alternative cortinas available.");
+          return;
+        }
+
+        // Normalize the replacement payload for the updater
+        const seconds = Number.isFinite(repl.seconds) ? repl.seconds : 60;
+        replaceCortinaAt(ti, {
+          id: repl.id,
+          title: repl.title || "Cortina",
+          artist: repl.artist ?? repl.singer ?? null,
+          singer: repl.singer ?? null,
+          approxMinutes:
+            repl.approxMinutes ?? Math.max(1, Math.round(seconds / 60)),
+          seconds,
+          cortinagenre, // persists on block as cortinaGenre
+        });
+      });
+
+      const statusBadge = $("#status-badge");
+      const activityLog = $("#activity-log");
+      const llmPre = $("#llm-transcript");
+      $("#log-clear").onclick = () => (activityLog.textContent = "");
+      $("#llm-clear").onclick = () => (llmPre.textContent = "");
+
+      /** Status badge (Idle/Busy/OK/Error) */
+      function setStatus({ text = "Idle", state = "idle", busy = false } = {}) {
+        statusBadge.textContent = text;
+        statusBadge.classList.remove("busy", "ok", "err");
+        if (state === "ok") statusBadge.classList.add("ok");
+        else if (state === "err") statusBadge.classList.add("err");
+        else if (busy) statusBadge.classList.add("busy");
+      }
+
+      /** Append a line to the activity log */
+      function logLine(msg, cls = "") {
+        const t = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+        const div = document.createElement("div");
+        div.innerHTML = `<span class="time">[${t}]</span> <span class="${cls}">${msg}</span>`;
+        activityLog.append(div);
+        activityLog.scrollTop = activityLog.scrollHeight;
+      }
+
+      /** Append to LLM transcript; keeps the last N KB to avoid bloat */
+      function appendLLM(text) {
+        llmPre.textContent += text;
+        if (llmPre.textContent.length > 200_000) {
+          llmPre.textContent = llmPre.textContent.slice(-150_000);
+        }
+        llmPre.scrollTop = llmPre.scrollHeight;
+      }
+      function setLLM(text) {
+        llmPre.textContent = text || "";
+      }
+      async function fetchWithLog(url, opts = {}, phase = "") {
+        if (phase) logLine(`→ ${phase}…`, "phase");
+        const res = await fetch(url, opts);
+        if (!res.ok) {
+          logLine(`✖ ${phase} failed (${res.status})`, "err");
+        } else if (phase) {
+          logLine(`✔ ${phase} done`, "ok");
+        }
+        return res;
+      }
+
+      function playSpecific(tandaIndex, trackIndex) {
+        if (!PLAN) return;
+        const blk = PLAN.tandas[tandaIndex];
+        if (!blk) return;
+        curIdx = tandaIndex;
+        curTrackOffset = Math.max(
+          0,
+          Math.min(trackIndex, (blk.tracks?.length ?? 1) - 1)
+        );
+        playBlock(curIdx);
+      }
+
+      function fmtMin(m) {
+        const mins = Math.floor(m),
+          secs = Math.round((m - mins) * 60);
+        return `${mins}:${String(secs).padStart(2, "0")}`;
+      }
+      function clockAdd(minutes) {
+        const d = new Date();
+        d.setMinutes(d.getMinutes() + Math.round(minutes));
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
+      function streamUrl(streamId) {
+        return `/stream/${ensureStreamId(streamId)}`;
+      }
+      // --- base64url helpers for /stream/:id ---
+      function toB64Url(str) {
+        const utf8 = new TextEncoder().encode(str);
+        let bin = "";
+        for (const b of utf8) bin += String.fromCharCode(b);
+        const b64 = btoa(bin)
+          .replace(/\+/g, "-")
+          .replace(/\//g, "_")
+          .replace(/=+$/, "");
+        return b64;
+      }
+
+      // Track.id might be an absolutePath (needs encoding) or already base64url.
+      // Produce a safe stream id either way.
+      function ensureStreamId(id) {
+        if (!id) return "";
+        // If it looks like base64url, keep; if it contains '/', it's a path -> encode
+        if (/^[A-Za-z0-9\-_]+$/.test(id) && !id.includes("/")) return id;
+        return toB64Url(id);
+      }
+
+      // ---------- Catalog (for agent endpoints) ----------
+      async function fetchCompact(style, maxPages = 2, pageSize = 400) {
+        const out = [];
+        for (let page = 1; page <= maxPages; page++) {
+          const res = await fetch(
+            `/api/catalog/compact?style=${encodeURIComponent(
+              style
+            )}&page=${page}&pageSize=${pageSize}`
+          );
+          const data = await res.json();
+          out.push(
+            ...data.tracks.map((t) => ({
+              ...t,
+              styles: Array.from(new Set([...(t.styles || []), style])),
+            }))
+          );
+          if (page >= data.paging.pages) break;
+        }
+        return out;
+      }
+
+      async function buildAgentCatalog() {
+        const tango = await fetchCompact("Tango", 2, 400);
+        const vals = await fetchCompact("Vals", 1, 300);
+        const milonga = await fetchCompact("Milonga", 1, 300);
+
+        const map = new Map();
+        for (const t of [...tango, ...vals, ...milonga]) {
+          const k = t.id || getAbsolutePath(t);
+          if (!map.has(k)) map.set(k, { ...t });
+          else {
+            const prev = map.get(k);
+            map.set(k, {
+              ...prev,
+              styles: Array.from(
+                new Set([...(prev.styles || []), ...(t.styles || [])])
+              ),
+            });
+          }
+        }
+        const tracks = [...map.values()];
+        return {
+          tracks: tracks.map((t) => ({
+            id: t.id, // base64url(absolutePath) from /api/catalog/compact
+            file: {
+              absPath: t.absolutePath, // Use the correct property from /api/catalog/compact
+              absolutePath: t.absolutePath, // Also include this for compatibility
+            },
+            title: t.title,
+            artist: t.artist,
+            BPM: getBPM(t),
+            Energy: t.Energy,
+            Key: t.Key,
+            camelotKey: t.camelotKey,
+            styles: t.styles, // ["Tango"] | ["Vals"] | ["Milonga"]
+            artUrl: t.artUrl,
+          })),
+        };
+      }
+
+      async function loadCatalogForPlanner({
+        styleCSV = "Tango,Vals,Milonga",
+        q = "",
+        page = 1,
+        pageSize = 500,
+      }) {
+        const url = `/api/catalog/compact?style=${encodeURIComponent(
+          styleCSV
+        )}&search=${encodeURIComponent(q)}&page=${page}&pageSize=${pageSize}`;
+        const { tracks } = await (await fetch(url)).json();
+        return {
+          tracks: tracks.map((t) => ({
+            id: t.id,
+            file: {
+              absPath: t.absolutePath, // Use the correct property from /api/catalog/compact
+              absolutePath: t.absolutePath, // Also include this for compatibility
+            },
+            title: t.title,
+            artist: t.artist,
+            BPM: getBPM(t),
+            Energy: t.Energy,
+            Key: t.Key,
+            camelotKey: t.camelotKey,
+            styles: t.styles,
+            artUrl: t.artUrl,
+          })),
+        };
+      }
+
+      async function prepareCatalog() {
+        // You can preload on page load if you prefer; this is idempotent.
+        if (!window.currentCatalog) {
+          window.currentCatalog = await loadCatalogForPlanner({
+            styleCSV: "Tango,Vals,Milonga",
+            q: "",
+          });
+        }
+      }
+
+      const plNameEl = $("#pl-name");
+      const plSaveBtn = $("#pl-save");
+      const plListSel = $("#pl-list");
+      const plRefreshBtn = $("#pl-refresh");
+      const plLoadBtn = $("#pl-load");
+
+      function replaceCortinaAt(idx, newC) {
+        const seconds = Number.isFinite(newC.seconds) ? newC.seconds : 60;
+        const title = newC.title || "Cortina";
+        const artist = newC.artist ?? newC.singer ?? null;
+        const singer = newC.singer ?? null;
+
+        // Update a single source of truth
+        PLAN.tandas[idx] = {
+          ...PLAN.tandas[idx],
+          type: "tanda",
+          style: "Cortina",
+          cortinaGenre:
+            newC.cortinagenre || PLAN.tandas[idx]?.cortinaGenre || "default",
+          tangoGenre:
+            newC.tangogenre || PLAN.tandas[idx]?.tangoGenre || "default",
+          size: 1,
+          approxMinutes: Math.max(1, Math.round(seconds / 60)),
+          title,
+          artist,
+          singer,
+          tracks: [
+            {
+              id: newC.id,
+              title,
+              artist,
+              seconds,
+            },
+          ],
+          streamId: newC.id,
+        };
+
+        // Re-render only this card
+        if (typeof renderTandaCard === "function") renderTandaCard(idx);
+        else renderPlan();
+
+        if (idx === curIdx) {
+          curTrackOffset = 0;
+          // Hard reset the element so browsers drop the old buffer
+          player.pause();
+          player.removeAttribute("src"); // or: player.src = "";
+          player.load();
+          playBlock(idx);
+        }
+      }
+      // Save current PLAN as a playlist
+      async function saveCurrentPlaylist() {
+        if (!PLAN || !Array.isArray(PLAN.tandas) || PLAN.tandas.length === 0) {
+          alert("No plan to save.");
+          return;
+        }
+        const name =
+          (plNameEl.value || "").trim() ||
+          `Milonga ${new Date().toLocaleString()}`;
+        const res = await fetch("/api/playlists", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, plan: PLAN }),
+        });
+        const data = await res.json();
+        if (!res.ok) return alert(data.error || "Save failed");
+        alert(`Saved as "${name}"`);
+        await refreshPlaylistList();
+      }
+
+      // Populate the dropdown with stored playlists
+      async function refreshPlaylistList() {
+        const res = await fetch("/api/playlists");
+        const data = await res.json();
+        if (!res.ok) return alert(data.error || "List failed");
+        const opts = [`<option value="">— saved playlists —</option>`];
+        for (const p of data.playlists || []) {
+          const label = `${p.name} — ${new Date(p.createdAt).toLocaleString()}`;
+          opts.push(`<option value="${p.id}">${label}</option>`);
+        }
+        plListSel.innerHTML = opts.join("");
+      }
+
+      // Load selected playlist (and render)
+      async function loadSelectedPlaylist() {
+        const id = plListSel.value;
+        if (!id) return alert("Select a playlist first.");
+        const res = await fetch(`/api/playlists/${encodeURIComponent(id)}`);
+        const data = await res.json();
+        if (!res.ok) return alert(data.error || "Load failed");
+
+        // Adopt plan & render
+        if (!data.plan || !Array.isArray(data.plan.tandas)) {
+          return alert("Malformed playlist file.");
+        }
+        PLAN = data.plan;
+        clearReplacementHistory(); // Clear history when loading a new plan
+        enrichCortinaMetadataInPlan();
+
+        // Ensure catalog is loaded for replacements
+        await ensureCatalogReady();
+
+        curIdx = -1;
+        curTrackOffset = 0;
+        renderPlan();
+
+        // UI niceties
+        const minutesPlanned =
+          PLAN.totalMinutes ||
+          PLAN.tandas.reduce((m, b) => m + (b.approxMinutes || 0), 0);
+        totalEl.textContent = `(${minutesPlanned} min, ${
+          PLAN.tandas.filter((x) => x.type === "tanda").length
+        } tandas)`;
+        etaEl.textContent = clockAdd(minutesPlanned);
+        nowEl.textContent = "–";
+        player.src = "";
+      }
+
+      // Wire up
+      plSaveBtn.onclick = saveCurrentPlaylist;
+      plRefreshBtn.onclick = refreshPlaylistList;
+      plLoadBtn.onclick = loadSelectedPlaylist;
+
+      // On page load, fetch list once
+      refreshPlaylistList();
+
+      // ====== Tanda Library Functions ======
+
+      // Save a tanda to the library
+      async function saveTandaToLibrary(tandaIndex, customName = null) {
+        if (!PLAN || tandaIndex < 0 || tandaIndex >= PLAN.tandas.length) return;
+
+        const tanda = PLAN.tandas[tandaIndex];
+        if (tanda.type !== "tanda") {
+          return alert("Can only save tandas, not cortinas");
+        }
+
+        const defaultName = `${tanda.orchestra} ${tanda.style}`;
+        const name = customName || prompt(`Save tanda as:`, defaultName);
+        if (!name) return;
+
+        try {
+          const res = await fetch("/api/tandas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, tanda }),
+          });
+
+          if (res.ok) {
+            const result = await res.json();
+            console.log("✅ Tanda saved:", result);
+            alert(`Tanda "${name}" saved to library!`);
+            await refreshTandaLibrary();
+          } else {
+            const error = await res.text();
+            throw new Error(error);
+          }
+        } catch (e) {
+          console.error("❌ Save tanda failed:", e);
+          alert(`Failed to save tanda: ${e.message}`);
+        }
+      }
+
+      // Populate the tanda library dropdown
+      async function refreshTandaLibrary() {
+        try {
+          const res = await fetch("/api/tandas");
+          const data = await res.json();
+          const select = document.getElementById("tanda-list");
+
+          const opts = [`<option value="">— saved tandas —</option>`];
+          for (const t of data.tandas || []) {
+            const meta = t.metadata;
+            const label = `${t.name} (${t.orchestra}, ${
+              meta?.trackCount || 0
+            } tracks, ${meta?.approxMinutes || 0}m)`;
+            opts.push(`<option value="${t.id}">${label}</option>`);
+          }
+          select.innerHTML = opts.join("");
+        } catch (e) {
+          console.error("❌ Refresh tanda library failed:", e);
+        }
+      }
+
+      // Replace current tanda with one from library
+      async function loadTandaFromLibrary(tandaIndex) {
+        const select = document.getElementById("tanda-list");
+        const tandaId = select.value;
+        if (!tandaId) return alert("Select a tanda from the library first.");
+
+        if (!PLAN || tandaIndex < 0 || tandaIndex >= PLAN.tandas.length) {
+          return alert("Invalid tanda position");
+        }
+
+        try {
+          const res = await fetch(`/api/tandas/${encodeURIComponent(tandaId)}`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+          const data = await res.json();
+          if (!data.tanda) throw new Error("Invalid tanda data");
+
+          // Replace the tanda in the plan
+          PLAN.tandas[tandaIndex] = {
+            type: "tanda",
+            orchestra: data.tanda.orchestra,
+            style: data.tanda.style,
+            tracks: data.tanda.tracks || [],
+            approxMinutes: data.tanda.metadata?.approxMinutes || 0,
+          };
+
+          renderPlan();
+          console.log(
+            `✅ Loaded tanda "${data.name}" into position ${tandaIndex}`
+          );
+          alert(`Loaded "${data.name}" into tanda ${tandaIndex + 1}`);
+        } catch (e) {
+          console.error("❌ Load tanda failed:", e);
+          alert(`Failed to load tanda: ${e.message}`);
+        }
+      }
+
+      // Delete selected tanda from library
+      async function deleteSelectedTanda() {
+        const select = document.getElementById("tanda-list");
+        const tandaId = select.value;
+        if (!tandaId) return alert("Select a tanda to delete first.");
+
+        const selectedOption = select.options[select.selectedIndex];
+        const tandaName = selectedOption?.text || "selected tanda";
+
+        if (!confirm(`Delete "${tandaName}" from tanda library?`)) return;
+
+        try {
+          const res = await fetch(
+            `/api/tandas/${encodeURIComponent(tandaId)}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (res.ok) {
+            console.log(`✅ Deleted tanda ${tandaId}`);
+            alert("Tanda deleted from library.");
+            await refreshTandaLibrary();
+          } else {
+            const error = await res.text();
+            throw new Error(error);
+          }
+        } catch (e) {
+          console.error("❌ Delete tanda failed:", e);
+          alert(`Failed to delete tanda: ${e.message}`);
+        }
+      }
+
+      // Wire up tanda library controls
+      const tandaRefreshBtn = document.getElementById("tanda-refresh");
+      const tandaDeleteBtn = document.getElementById("tanda-delete");
+
+      tandaRefreshBtn.onclick = refreshTandaLibrary;
+      tandaDeleteBtn.onclick = deleteSelectedTanda;
+
+      // Load tanda library on startup
+      refreshTandaLibrary();
+
+      function renderTandaCard(ti) {
+        if (!PLAN) return;
+        const container = timelineEl;
+        const old = container.querySelector(`.card[data-index="${ti}"]`);
+        if (!old) {
+          renderPlan();
+          return;
+        } // fallback
+
+        const blk = PLAN.tandas[ti];
+        enrichCortinaMetadataInPlan();
+        const isCortina =
+          blk.type === "cortina" ||
+          (blk.style || "").toLowerCase() === "cortina";
+
+        const card = document.createElement("div");
+
+        card.className = "card";
+        if (isCortina) card.classList.add("cortina");
+        card.dataset.index = ti;
+        card.dataset.tandaIndex = ti;
+        // Unified header
+        const hdr = document.createElement("div");
+        hdr.className = "row";
+        const b = document.createElement("span");
+        b.className = isCortina ? "badge" : `badge style-${blk.style}`;
+        const trackCount = blk.tracks?.length ?? 1;
+        b.textContent = `${isCortina ? "Cortina" : blk.style} • ${trackCount} ${
+          trackCount === 1 ? "song" : "songs"
+        } • ~${blk.approxMinutes ?? "?"}m`;
+        const g = document.createElement("small");
+        g.className = "muted";
+        g.style.marginLeft = "8px";
+        if (isCortina && blk.cortinaGenre)
+          g.textContent = `(${blk.cortinaGenre})`;
+        if (!isCortina && blk.tangoGenre) g.textContent = `(${blk.tangoGenre})`;
+        const buttonsContainer = document.createElement("div");
+        buttonsContainer.style.marginLeft = "auto";
+        buttonsContainer.style.display = "flex";
+        buttonsContainer.style.gap = "4px";
+
+        const swapBtn = !isCortina ? document.createElement("button") : null;
+        if (swapBtn) {
+          swapBtn.textContent = "Select";
+          swapBtn.className = "tiny";
+          swapBtn.onclick = () => selectSwap(ti, card);
+          buttonsContainer.appendChild(swapBtn);
+        }
+
+        // Add Retry Tanda button for problematic tandas
+        if (!isCortina) {
+          const retryBtn = document.createElement("button");
+          retryBtn.textContent = "↻ Retry";
+          retryBtn.className = "tiny retry-btn";
+          retryBtn.title =
+            "Regenerate this tanda with different tracks/orchestra";
+          retryBtn.onclick = () => retryTanda(ti);
+
+          // Highlight retry button if tanda has issues
+          const realTrackCount = (blk.tracks || []).filter(
+            (t) => t.id && t.title !== "replace this"
+          ).length;
+          if (
+            realTrackCount === 0 ||
+            realTrackCount < (blk.tracks || []).length * 0.5
+          ) {
+            retryBtn.classList.add("problem");
+            retryBtn.title =
+              "⚠ This tanda has missing tracks - click to retry with different selection";
+          }
+
+          buttonsContainer.appendChild(retryBtn);
+
+          // Add Save Tanda button
+          const saveBtn = document.createElement("button");
+          saveBtn.textContent = "💾 Save";
+          saveBtn.className = "tiny";
+          saveBtn.title = "Save this tanda to your library";
+          saveBtn.onclick = () => saveTandaToLibrary(ti);
+          buttonsContainer.appendChild(saveBtn);
+
+          // Add Load Tanda button
+          const loadBtn = document.createElement("button");
+          loadBtn.textContent = "📂 Load";
+          loadBtn.className = "tiny";
+          loadBtn.title = "Replace this tanda with one from your library";
+          loadBtn.onclick = () => loadTandaFromLibrary(ti);
+          buttonsContainer.appendChild(loadBtn);
+        }
+
+        hdr.append(b, g, buttonsContainer);
+        card.append(hdr);
+
+        // Unified tracks loop (cortina has one track)
+        const tracksToRender =
+          isCortina && (!blk.tracks || blk.tracks.length === 0)
+            ? [
+                {
+                  id: blk.streamId || blk.id,
+                  title: blk.title || "Cortina",
+                  artist: blk.artist || blk.singer,
+                },
+              ]
+            : blk.tracks || [];
+
+        tracksToRender.forEach((t, k) => {
+          const tr = document.createElement("div");
+          tr.className = "track" + (isCortina ? " cortina-track" : "");
+          tr.dataset.tandaIndex = String(ti);
+          tr.dataset.trackIndex = String(isCortina ? 0 : k);
+          const metaRight = isCortina
+            ? ""
+            : `<small>${getBPM(t) ?? ""} bpm • ${
+                t.camelotKey ?? t.Key ?? ""
+              }</small>`;
+          const actionBtn = isCortina
+            ? `<button type="button" class="tiny danger delete-cortina" data-index="${ti}" title="Replace cortina">✕</button>`
+            : `<button type="button" class="tiny danger delete-track" data-tanda-index="${ti}" data-track-index="${k}" title="Remove">✕</button>`;
+          tr.innerHTML = `
+                  <div>
+                    <div>${t.title}</div>
+                    <small class="${isCortina ? "muted" : ""}">${
+            t.artist ?? blk.artist ?? ""
+          }</small>
+                  </div>
+                  <div>
+                    ${metaRight}
+                    ${actionBtn}
+                  </div>`;
+          tr.style.cursor = "pointer";
+          card.append(tr);
+        });
+
+        container.replaceChild(card, old);
+        // Restore highlight if this tanda is playing
+        if (ti === curIdx) highlightNow(ti);
+      }
+
+      // ---------- Streaming tanda  agent plan (NDJSON) ----------
+      async function streamPlan(payload, onEvent) {
+        if (
+          !payload?.catalog ||
+          !Array.isArray(payload.catalog.tracks) ||
+          payload.catalog.tracks.length === 0
+        ) {
+          throw new Error(
+            "No catalog loaded: please load or select tracks first."
+          );
+        }
+        const res = await fetch("/api/agent/generate/ndjson", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error("Stream failed: " + res.status);
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = "";
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+
+          let nl;
+          while ((nl = buf.indexOf("\n")) >= 0) {
+            const line = buf.slice(0, nl).trim();
+            buf = buf.slice(nl + 1);
+            if (!line) continue;
+            try {
+              const evt = JSON.parse(line);
+              onEvent(evt);
+            } catch (e) {
+              console.warn("bad line:", line, e);
+            }
+          }
+        }
+      }
+      function findInCortinaPoolById(id) {
+        const pool = window.cortinaPool || [];
+        if (!id || !pool.length) return null;
+        // match by id or streamId
+        return pool.find((c) => c?.id === id || c?.streamId === id) || null;
+      }
+
+      // If a cortina in PLAN lacks artist/singer, fill from pool
+      function enrichCortinaMetadataInPlan() {
+        if (!PLAN || !Array.isArray(PLAN.tandas)) return;
+        for (const blk of PLAN.tandas) {
+          if (!isCortinaBlock(blk)) continue;
+          const hasArtist = !!blk.artist;
+          const hasSinger = !!blk.singer;
+          const id = blk.streamId || blk.id || null;
+          if (hasArtist && hasSinger) continue;
+
+          const pooled = findInCortinaPoolById(id);
+          if (pooled) {
+            if (!hasArtist && pooled.artist) blk.artist = pooled.artist;
+            if (!hasSinger && pooled.singer) blk.singer = pooled.singer;
+            if (!blk.title && pooled.title) blk.title = pooled.title;
+            if (
+              !Number.isFinite(blk.approxMinutes) &&
+              Number.isFinite(pooled.approxMinutes)
+            ) {
+              blk.approxMinutes = pooled.approxMinutes;
+            }
+          }
+        }
+      }
+      // Button handler for “Generate Tandas (stream tanda by tanda)”
+
+      async function tandaPlanner() {
+        await prepareCatalog(); // gets the catalog for all tracks
+
+        PLAN = { tandas: [], totalMinutes: 0 };
+        clearReplacementHistory(); // Clear history when generating new plan
+        timelineEl.innerHTML = "";
+        totalEl.textContent = "";
+        summaryEl.textContent = "";
+        setLLM(""); // clear transcript
+        setStatus({ text: "Planning…", busy: true });
+        logLine("Starting streamed planning", "phase");
+
+        const minutes = Number($("#minutes").value || 180);
+        let built = 0;
+
+        try {
+          await streamPlan(
+            {
+              minutes,
+              pattern: ["Tango", "Tango", "Vals", "Tango", "Tango", "Milonga"],
+              sizes: { Tango: 4, Vals: 3, Milonga: 3 },
+              catalog: window.currentCatalog,
+            },
+            (evt) => {
+              switch (evt.type) {
+                case "start":
+                  summaryEl.textContent = "Planning…";
+                  logLine("Agent: start");
+                  break;
+
+                case "llm_delta": // <— OPTIONAL: if your backend emits token deltas
+                  appendLLM(evt.text || "");
+                  break;
+
+                case "llm_message": // <— OPTIONAL: full chunked message event
+                  appendLLM((evt.text || "") + "\n");
+                  break;
+
+                case "tanda":
+                  built += 1;
+                  logLine(`Tanda #${built} (${evt.tanda.style}) constructed`);
+                  const approxMinutes = Math.max(
+                    1,
+                    Math.round((evt.tanda.seconds || 0) / 60)
+                  );
+                  PLAN.tandas.push({
+                    type: "tanda",
+                    style: evt.tanda.style,
+                    size: evt.tanda.tracks.length,
+                    approxMinutes,
+                    tracks: evt.tanda.tracks.map((t) => ({
+                      id: t.id,
+                      title: t.title,
+                      artist: t.artist,
+                      BPM: getBPM(t) ?? t.BPM ?? null,
+                      Energy: t.energy ?? t.Energy ?? null,
+                      Key: t.key ?? t.Key ?? null,
+                      camelotKey: t.camelotKey ?? null,
+                    })),
+                  });
+                  PLAN.totalMinutes += approxMinutes;
+                  renderPlan();
+                  summaryEl.textContent = `Built ${built} tandas…`;
+                  break;
+
+                case "summary":
+                  logLine(
+                    `Summary: ${evt.summary.tandaCount} tandas, ~${evt.summary.minutesPlanned} minutes`,
+                    "ok"
+                  );
+                  summaryEl.textContent = `Planned ${evt.summary.tandaCount} tandas; ~${evt.summary.minutesPlanned} minutes.`;
+                  break;
+
+                case "done": {
+                  logLine("Planning complete", "ok");
+
+                  // The server's DONE payload already includes the interleaved plan (tandas + cortinas).
+                  // Normalize it (works for both interleaved and split shapes) and adopt it.
+                  const normalized = normalizePlanResponse(evt);
+
+                  if (normalized) {
+                    PLAN = normalized;
+                    enrichCortinaMetadataInPlan();
+                    renderPlan();
+                  }
+                  // After setStatus({ text: "Ready", state: "ok" });
+                  if (Array.isArray(evt.plan?.cortinas)) {
+                    setCortinaPool(evt.plan.cortinas);
+                    enrichCortinaMetadataInPlan();
+                    renderPlan();
+                  }
+
+                  const minutesPlanned =
+                    evt.display?.summary?.minutesPlanned ??
+                    PLAN?.totalMinutes ??
+                    minutes;
+
+                  totalEl.textContent = `(${minutesPlanned} min, ${
+                    PLAN?.tandas?.filter((x) => x.type === "tanda").length ?? 0
+                  } tandas)`;
+                  etaEl.textContent = clockAdd(minutesPlanned);
+                  setStatus({ text: "Ready", state: "ok" });
+                  break;
+                }
+
+                case "error":
+                  logLine(`Agent error: ${evt.message || "unknown"}`, "err");
+                  setStatus({ text: "Error", state: "err" });
+                  break;
+
+                default:
+                  // keep unknowns visible for debugging
+                  if (evt.info) logLine(String(evt.info));
+              }
+            }
+          );
+        } catch (e) {
+          logLine(`Stream failed: ${e.message || e}`, "err");
+          setStatus({ text: "Error", state: "err" });
+          alert(e.message || String(e));
+        }
+      }
+
+      // ---------- Non-stream deterministic planner endpoint ----------
+      async function generatePlan() {
+        const minutes = Number($("#minutes").value || 180);
+        const res = await fetch("/api/plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ minutes }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Plan error");
+          return;
+        }
+        PLAN = data.plan;
+        clearReplacementHistory(); // Clear history when generating new plan
+        curIdx = -1;
+        curTrackOffset = 0;
+        renderPlan();
+        totalEl.textContent = `(${PLAN.totalMinutes} min, ${
+          PLAN.tandas.filter((x) => x.type === "tanda").length
+        } tandas)`;
+        etaEl.textContent = clockAdd(PLAN.totalMinutes);
+        nowEl.textContent = "–";
+        player.src = "";
+      }
+      // Normalize any server response shape into { tandas:[{type:"tanda"| "cortina", ...}], totalMinutes:number }
+      function normalizePlanResponse(data) {
+        if (!data) return null;
+        // 1) Find plan-like payload
+        const plan =
+          data.plan ??
+          (Array.isArray(data.tandas) ? { tandas: data.tandas } : null);
+        if (!plan) return null;
+
+        // 2) If already interleaved, just ensure totalMinutes
+        if (
+          Array.isArray(plan.tandas) &&
+          plan.tandas.every((x) => x && x.type)
+        ) {
+          const total =
+            plan.totalMinutes ??
+            plan.tandas.reduce((m, b) => m + (b.approxMinutes || 0), 0);
+          return { tandas: plan.tandas, totalMinutes: total };
+        }
+
+        // 3) If server returned separate arrays (e.g., tandasResolved + cortinas or {tandas: [...], cortinas:[...]})
+        const tandasRaw = plan.tandasResolved ?? plan.tandas ?? [];
+        const cortinas = plan.cortinas ?? [];
+
+        // If tandasRaw are *just* track arrays (no .type), wrap them
+        const tandaBlocks = tandasRaw.map((td) => {
+          if (td?.type === "tanda") return td;
+          const approxMinutes =
+            td?.approxMinutes ??
+            (td?.seconds
+              ? Math.max(1, Math.round(td.seconds / 60))
+              : Math.max(
+                  1,
+                  Math.round(
+                    (td?.tracks?.reduce((s, t) => s + (t?.seconds || 0), 0) ||
+                      0) / 60
+                  )
+                ));
+          return {
+            type: "tanda",
+            style: td?.style ?? "Tango",
+            size: td?.size ?? (td?.tracks?.length || 0),
+            approxMinutes,
+            tracks: (td?.tracks || []).map((t) => ({
+              id: t.id,
+              title: t.title ?? t?.tags?.title ?? "Unknown",
+              artist: t.artist ?? t?.tags?.artist ?? null,
+              BPM: t.BPM ?? t?.tags?.BPM ?? t?.tempoBPM ?? null,
+              Energy: t.Energy ?? t?.tags?.Energy ?? null,
+              Key: t.Key ?? t?.tags?.Key ?? null,
+              camelotKey: t.camelotKey ?? t?.tags?.camelotKey ?? null,
+              seconds: t.seconds ?? t?.format?.durationSec ?? null,
+            })),
+          };
+        });
+
+        // Interleave cortinas after each tanda if present
+        const seq = [];
+        let ci = 0;
+
+        for (const td of tandaBlocks) {
+          // Add the tanda
+          seq.push(td);
+
+          // Add cortina after each tanda (except possibly the last)
+          if (cortinas.length && ci < cortinas.length) {
+            const c = cortinas[ci];
+            const id = c?.id || c?.streamId || c?.tracks?.[0]?.id || null;
+            const title = c?.title || c?.tracks?.[0]?.title || "Cortina";
+            const artist =
+              c?.artist ?? c?.tags?.artist ?? c?.tracks?.[0]?.artist ?? null;
+            const seconds = Number.isFinite(c?.seconds)
+              ? c.seconds
+              : Number.isFinite(c?.tracks?.[0]?.seconds)
+              ? c.tracks[0].seconds
+              : 60;
+
+            seq.push({
+              type: "cortina",
+              style: "Cortina",
+              size: 1,
+              approxMinutes: Number.isFinite(c?.approxMinutes)
+                ? c.approxMinutes
+                : Math.max(1, Math.round(seconds / 60)),
+              title,
+              artist,
+              singer: c?.singer ?? c?.tags?.singer ?? null,
+              tracks: [{ id, title, artist, seconds }],
+              streamId: id,
+            });
+            ci++;
+          }
+        }
+
+        const totalMinutes =
+          plan.totalMinutes ??
+          seq.reduce((m, b) => m + (b.approxMinutes || 0), 0);
+
+        return { tandas: seq, totalMinutes };
+      }
+      // ---------- One-shot agent endpoint (JSON, not stream) ----------
+      async function agentGeneratePlan() {
+        const catalog = await loadCatalogForPlannerFromPairs();
+        window.currentCatalog = {
+          tracks: (catalog.tracks || []).map((t) => ({
+            id: t.id,
+            file: {
+              absolutePath:
+                t.file?.absolutePath ?? getAbsolutePath(t) ?? t.path ?? null,
+            },
+            title: t.title,
+            artist: t.artist,
+            BPM: getBPM(t),
+            Energy: t.Energy ?? null,
+            Key: t.Key ?? null,
+            camelotKey: t.camelotKey ?? null,
+            styles: t.styles,
+            artUrl: t.artUrl,
+          })),
+        };
+        const body = await buildGenerateBody();
+        const minutes = Number($("#minutes").value || 180);
+        //const payload = { minutes, catalog: window.currentCatalog };
+        const res = await fetch("/api/agent/bulkGenerate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const text = await res.text();
+        let data = {};
+        try {
+          data = text ? JSON.parse(text) : {};
+          // after `data = text ? JSON.parse(text) : {};`
+          if (Array.isArray(data?.plan?.cortinas)) {
+            setCortinaPool(data.plan.cortinas);
+          }
+        } catch (_) {}
+
+        if (!res.ok) {
+          console.error("Agent error body:", text);
+          alert((data && data.error) || `Agent error (HTTP ${res.status}).`);
+          return;
+        }
+
+        const normalized = normalizePlanResponse(data);
+        if (!normalized) {
+          console.error("Raw server body:", text);
+          alert("Malformed plan returned by server.");
+          return;
+        }
+
+        PLAN = normalized;
+        enrichCortinaMetadataInPlan();
+        curIdx = -1;
+        curTrackOffset = 0;
+        renderPlan();
+
+        const minutesPlanned =
+          PLAN.totalMinutes ??
+          PLAN.tandas.reduce((m, b) => m + (b.approxMinutes || 0), 0);
+
+        totalEl.textContent = `(${minutesPlanned} min, ${
+          PLAN.tandas.filter((x) => x.type === "tanda").length
+        } tandas)`;
+        etaEl.textContent = clockAdd(minutesPlanned);
+        nowEl.textContent = "–";
+        player.src = "";
+      }
+
+      // ---------- Timeline rendering & playback ----------
+      function renderPlan() {
+        timelineEl.innerHTML = "";
+        PLAN.tandas.forEach((_, idx) => {
+          // create a placeholder so renderTandaCard can replace it
+          const placeholder = document.createElement("div");
+          placeholder.className = "card";
+          placeholder.dataset.index = idx;
+          timelineEl.appendChild(placeholder);
+          renderTandaCard(idx);
+        });
+      }
+
+      async function ensureCatalogReady() {
+        if (window.currentCatalog?.tracks?.length) {
+          console.log(
+            `[CATALOG] Already loaded: ${window.currentCatalog.tracks.length} tracks`
+          );
+          return window.currentCatalog;
+        }
+
+        console.log("[CATALOG] Loading catalog for replacement...");
+        try {
+          // Build the same compact catalog you use for planning
+          window.currentCatalog = await loadCatalogForPlanner({
+            styleCSV: "Tango,Vals,Milonga",
+            q: "",
+            page: 1,
+            pageSize: 500,
+          });
+          console.log(
+            `[CATALOG] Successfully loaded: ${
+              window.currentCatalog?.tracks?.length || 0
+            } tracks`
+          );
+
+          if (!window.currentCatalog?.tracks?.length) {
+            throw new Error("Catalog loaded but contains no tracks");
+          }
+
+          return window.currentCatalog;
+        } catch (error) {
+          console.error("[CATALOG] Failed to load catalog:", error);
+          throw error;
+        }
+      }
+
+      async function openReplacementPicker(tandaIndex, trackIndex) {
+        // Make sure we have a catalog ready for the backend
+        const catalog = await ensureCatalogReady(); // <-- returns window.currentCatalog
+
+        if (!PLAN) return;
+        const tanda = PLAN.tandas[tandaIndex];
+        if (!tanda || tanda.type !== "tanda") return;
+
+        // Track being removed
+        const removed = tanda.tracks[trackIndex];
+
+        // Debug unknown tracks
+        console.log(`[REPLACEMENT] Target track:`, removed);
+        console.log(`[REPLACEMENT] All tanda tracks:`, tanda.tracks);
+
+        // Check for missing or problematic data
+        if (!removed) {
+          throw new Error(
+            `No track found at position ${trackIndex} in tanda ${tandaIndex}`
+          );
+        }
+
+        if (!tanda.style) {
+          throw new Error(`Tanda ${tandaIndex} has no style defined`);
+        }
+
+        // Prefer same orchestra as the removed track (but ignore "Unknown")
+        let orchestra = (removed?.artist || "").trim() || null;
+        if (orchestra === "Unknown" || orchestra === "unknown") {
+          orchestra = null; // Don't restrict by orchestra for unknown tracks
+          console.log(
+            `[REPLACEMENT] Ignoring "Unknown" artist for orchestra filtering`
+          );
+        }
+
+        // Avoid reusing any track already in this tanda
+        const avoidIds = tanda.tracks.map((t) => t.id).filter(Boolean);
+        console.log(`[REPLACEMENT] Avoid IDs:`, avoidIds);
+
+        // Warn if some tracks don't have IDs
+        const tracksWithoutIds = tanda.tracks.filter((t) => !t.id);
+        if (tracksWithoutIds.length > 0) {
+          console.warn(
+            `[REPLACEMENT] Warning: ${tracksWithoutIds.length} tracks in tanda have no ID:`,
+            tracksWithoutIds
+          );
+        }
+
+        // Get replacement session for this position
+        const session = getReplacementSession(tandaIndex, trackIndex);
+        const previouslySelected = Array.from(session.attempted);
+
+        // Neighbor context (the agent uses this to keep continuity)
+        const neighbor = (d) => {
+          const tr = tanda.tracks[trackIndex + d];
+          return tr
+            ? {
+                id: tr.id,
+                bpm: tr.BPM ?? null,
+                energy: tr.Energy ?? null,
+                key: tr.camelotKey ?? tr.Key ?? null,
+                artist: tr.artist ?? null,
+                seconds: tr.seconds ?? null,
+              }
+            : null;
+        };
+        const neighbors = { prev: neighbor(-1), next: neighbor(+1) };
+
+        // Build payload
+        const payload = {
+          catalog, // <-- defined here, not a free variable
+          style: tanda.style,
+          orchestra,
+          position: { tandaIndex, trackIndex },
+          neighbors,
+          avoidIds,
+          previouslySelected, // Include previously selected tracks for broadening
+          topK: 5,
+        };
+
+        // Debug logging
+        console.log(
+          `[REPLACEMENT] Request for ${tanda.style} at ${tandaIndex}:${trackIndex}`
+        );
+        console.log(
+          `[REPLACEMENT] Catalog has ${catalog?.tracks?.length || 0} tracks`
+        );
+        console.log(
+          `[REPLACEMENT] Avoiding ${avoidIds.length} tracks:`,
+          avoidIds.slice(0, 3)
+        );
+        console.log(
+          `[REPLACEMENT] Previously selected ${previouslySelected.length} tracks:`,
+          previouslySelected.slice(0, 3)
+        );
+        console.log(
+          `[REPLACEMENT] Orchestra preference: ${orchestra || "none"}`
+        );
+        console.log(
+          `[REPLACEMENT] Track being replaced:`,
+          removed?.id,
+          removed?.title,
+          removed?.artist
+        );
+
+        if (!catalog?.tracks?.length) {
+          throw new Error("No catalog available for replacement");
+        }
+
+        // Optimistic UI: fade the row while we fetch a replacement
+        const card = document.querySelector(
+          `.card[data-index="${tandaIndex}"]`
+        );
+        const row = card?.querySelector(
+          `.track[data-track-index="${trackIndex}"]`
+        );
+        if (row) row.style.opacity = 0.5;
+
+        try {
+          const res = await fetch("/api/agent/replace", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Replacement failed");
+
+          const repl = data.replacement; // { id,title,artist,BPM,Energy,camelotKey,seconds,... }
+          if (!repl?.id) throw new Error("No replacement track returned");
+
+          // Track this replacement in the current session
+          session.attempted.add(repl.id);
+          console.log(
+            `[REPLACEMENT] Added ${repl.id} to session, now avoiding ${session.attempted.size} tracks`
+          );
+
+          // Log broadening information if available
+          if (data.metadata?.broadeningApplied) {
+            console.log(
+              `[REPLACEMENT] Broadening was applied for ${tanda.style} track at position ${tandaIndex}:${trackIndex}`
+            );
+            console.log(
+              `[REPLACEMENT] Previously selected: ${previouslySelected.length} tracks`
+            );
+            console.log(
+              `[REPLACEMENT] Pool expanded from ${data.metadata.originalPool} to ${data.metadata.finalPool} tracks`
+            );
+          }
+
+          // Patch the current plan and refresh only this tanda card
+          tanda.tracks.splice(trackIndex, 1, repl);
+
+          // (Optional) recompute tanda ~minutes for display
+          const secs = tanda.tracks.reduce((s, t) => s + (t.seconds || 0), 0);
+          tanda.approxMinutes = Math.max(1, Math.round(secs / 60));
+
+          // Clear the replacement session since we successfully applied a replacement
+          currentReplacementSession = null;
+          console.log(
+            "[REPLACEMENT] Session cleared after successful replacement"
+          );
+
+          // Re-render only this card (falls back to full render if helper missing)
+          if (typeof renderTandaCard === "function") {
+            renderTandaCard(tandaIndex);
+          } else {
+            renderPlan();
+          }
+
+          // If the replaced row was currently playing, restart that track
+          if (
+            curIdx === tandaIndex &&
+            row &&
+            row.classList.contains("playing")
+          ) {
+            curTrackOffset = Math.min(trackIndex, tanda.tracks.length - 1);
+            playBlock(curIdx);
+          }
+        } catch (err) {
+          console.error("[REPLACEMENT] Error:", err);
+          console.error("[REPLACEMENT] Failed payload:", payload);
+
+          // Clear session on error to avoid getting stuck
+          if (err.message && err.message.includes("No candidates available")) {
+            console.log(
+              "[REPLACEMENT] Clearing session due to no candidates - may need broader search"
+            );
+            currentReplacementSession = null;
+          }
+
+          let errorMessage = err.message || String(err);
+          if (
+            errorMessage.includes(
+              "None of the catalog tracks matched the library"
+            )
+          ) {
+            errorMessage +=
+              "\n\nThis might be due to:\n- Catalog not loaded properly\n- Path format mismatch between frontend and backend\n- Library files moved or renamed";
+          }
+
+          alert(errorMessage);
+          if (row) row.style.opacity = 1;
+        }
+      }
+      // ---- Cortina pool helpers (rotate through suggestions the server sent) ----
+      window.cortinaPool = window.cortinaPool || [];
+      window.cortinaIdx = window.cortinaIdx || 0;
+
+      function setCortinaPool(list) {
+        window.cortinaPool = Array.isArray(list) ? list.slice() : [];
+        window.cortinaIdx = 0;
+      }
+
+      function nextCortina(excludeId = null) {
+        const pool = window.cortinaPool || [];
+        if (!pool.length) return null;
+
+        // try up to pool.length to avoid returning the same item
+        for (let n = 0; n < pool.length; n++) {
+          const c = pool[window.cortinaIdx % pool.length];
+          window.cortinaIdx++;
+          if (!excludeId || c.id !== excludeId) return c;
+        }
+        // fallback if all equal
+        return pool[window.cortinaIdx++ % pool.length];
+      }
+
+      function applyReplacement(tandaIndex, trackIndex, opt) {
+        const tanda = PLAN.tandas[tandaIndex];
+        if (!tanda || tanda.type !== "tanda") return;
+
+        // Replace in place
+        tanda.tracks[trackIndex] = {
+          id: opt.id,
+          title: opt.title,
+          artist: opt.artist,
+          BPM: getBPM(opt) ?? null,
+          Energy: opt.Energy ?? null,
+          Key: null,
+          camelotKey: opt.camelotKey ?? null,
+        };
+
+        // Remove chooser UI
+        const card = timelineEl.querySelector(
+          `.card[data-index="${tandaIndex}"]`
+        );
+        card
+          ?.querySelectorAll(".replacement-chooser")
+          ?.forEach((el) => el.remove());
+
+        // Re-render timeline to update labels
+        renderPlan();
+
+        // If replacing the current playing track inside the current tanda, continue playing this slot
+        if (tandaIndex === curIdx) {
+          // restart at this track index
+          curTrackOffset = trackIndex;
+          playBlock(tandaIndex);
+        }
+      }
+      const plDeleteBtn = $("#pl-delete");
+
+      async function deleteSelectedPlaylist() {
+        const id = plListSel.value;
+        if (!id) {
+          alert("Select a playlist to delete.");
+          return;
+        }
+        // Optional: don’t delete if this is the one currently loaded and unsaved changes exist
+        const confirmMsg = `Delete this playlist permanently?\n\n${
+          plListSel.selectedOptions[0]?.textContent || id
+        }`;
+        if (!confirm(confirmMsg)) return;
+
+        const res = await fetch(`/api/playlists/${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Delete failed");
+          return;
+        }
+
+        // If you track the currently loaded playlist id, clear it when deleting
+        if (window.currentPlaylistId === id) {
+          window.currentPlaylistId = null;
+        }
+
+        await refreshPlaylistList();
+        // Keep the UI usable even if a tanda is selected — no relation needed
+        alert("Playlist deleted.");
+      }
+
+      plDeleteBtn.onclick = deleteSelectedPlaylist;
+
+      function selectSwap(i, card) {
+        if (swapFirst === null) {
+          swapFirst = i;
+          card.classList.add("swapSel");
+        } else if (swapFirst === i) {
+          swapFirst = null;
+          card.classList.remove("swapSel");
+        } else {
+          const a = swapFirst,
+            b = i;
+          const A = PLAN.tandas[a],
+            B = PLAN.tandas[b];
+          if (A.type !== "tanda" || B.type !== "tanda") {
+            alert("Select only tandas");
+            return;
+          }
+          [PLAN.tandas[a], PLAN.tandas[b]] = [B, A];
+          swapFirst = null;
+          document
+            .querySelectorAll(".swapSel")
+            .forEach((el) => el.classList.remove("swapSel"));
+          renderPlan();
+        }
+      }
+
+      async function retryTanda(tandaIndex) {
+        if (!PLAN || tandaIndex < 0 || tandaIndex >= PLAN.tandas.length) return;
+
+        const tanda = PLAN.tandas[tandaIndex];
+        if (tanda.type !== "tanda") {
+          alert("Can only retry tandas, not cortinas");
+          return;
+        }
+
+        // Give user options: generate new or load from library
+        const choice = prompt(
+          `Retry tanda ${tandaIndex + 1} (${tanda.orchestra}):\n\n` +
+            `Enter "generate" (or "g") to create a new tanda\n` +
+            `Enter "library" (or "l") to load from your tanda library\n` +
+            `Press Cancel to abort`,
+          "generate"
+        );
+
+        if (!choice) return;
+
+        const action = choice.toLowerCase().trim();
+        if (action.startsWith("l")) {
+          // Load from library
+          return loadTandaFromLibrary(tandaIndex);
+        } else if (!action.startsWith("g") && action !== "generate") {
+          return alert("Please enter 'generate' or 'library'");
+        }
+
+        // Continue with generation...
+
+        try {
+          // Clear any replacement session for this tanda
+          if (window.currentReplacementSession?.tandaIndex === tandaIndex) {
+            window.currentReplacementSession = null;
+          }
+
+          // Show loading state
+          const tandaCard = document.querySelector(
+            `[data-tanda-index="${tandaIndex}"]`
+          );
+          if (tandaCard) {
+            tandaCard.style.opacity = "0.6";
+            tandaCard.style.pointerEvents = "none";
+          }
+
+          setNowLabel(`Retrying tanda ${tandaIndex + 1}...`);
+
+          // Prepare the retry request
+          const retryData = {
+            tandaIndex: tandaIndex,
+            currentTanda: {
+              orchestra: tanda.orchestra,
+              style: tanda.style,
+              trackCount: (tanda.tracks || []).length,
+            },
+            avoidOrchestras: [tanda.orchestra], // Avoid current orchestra for variety
+            catalog: await ensureCatalogReady(),
+          };
+
+          const response = await fetch("/api/agent/retryTanda", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(retryData),
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `Retry failed: ${response.status} ${response.statusText}`
+            );
+          }
+
+          const result = await response.json();
+          console.log(
+            `✅ Retry successful for tanda ${tandaIndex + 1}:`,
+            result
+          );
+
+          if (result.success && result.tanda) {
+            // Replace the problematic tanda
+            PLAN.tandas[tandaIndex] = {
+              type: "tanda",
+              orchestra: result.tanda.orchestra,
+              style: result.tanda.style,
+              tracks: result.tanda.tracks || [],
+            };
+
+            // Re-render the plan
+            renderPlan();
+            setNowLabel(
+              `Tanda ${tandaIndex + 1} successfully regenerated with ${
+                result.tanda.orchestra
+              }`
+            );
+
+            // Success feedback
+            setTimeout(() => {
+              setNowLabel("Ready");
+            }, 3000);
+          } else {
+            throw new Error(
+              result.error || "Retry failed - no tanda generated"
+            );
+          }
+        } catch (error) {
+          console.error("❌ Retry tanda failed:", error);
+          setNowLabel(`Retry failed: ${error.message}`);
+          alert(`Failed to retry tanda: ${error.message}`);
+
+          // Restore card state
+          const tandaCard = document.querySelector(
+            `[data-tanda-index="${tandaIndex}"]`
+          );
+          if (tandaCard) {
+            tandaCard.style.opacity = "1";
+            tandaCard.style.pointerEvents = "auto";
+          }
+        }
+      }
+
+      function setNowLabel(text) {
+        nowEl.textContent = text;
+      }
+
+      async function playBlock(idx) {
+        const SERVER_URL = "http://localhost:4000";
+
+        if (!PLAN || idx < 0 || idx >= PLAN.tandas.length) return;
+
+        const blk = PLAN.tandas[idx];
+        curIdx = idx;
+
+        const tr = (blk.tracks || [])[curTrackOffset] || (blk.tracks || [])[0];
+        if (!tr) return;
+
+        const absPath = getAbsolutePath(tr)?.replace(/\\/g, "/") || "";
+        const trFilename = absPath.split("/").pop()?.toLowerCase();
+        const catalogArt = window.catalogArt;
+
+        let meta = catalogArt.tracks?.find((x) => {
+          const xPath = x?.file?.absPath || x?.file?.absolutePath || "";
+          return xPath.replace(/\\/g, "/") === absPath;
+        });
+
+        // Fallback if direct path match fails
+        if (!meta) {
+          meta = catalogArt.tracks?.find((x) => {
+            const xPath = x?.file?.absPath || "";
+            const xFilename = xPath.split("/").pop()?.toLowerCase();
+
+            const titleMatch =
+              (x.tags?.title || "").toLowerCase() ===
+              (tr.title || "").toLowerCase();
+            const artistMatch =
+              (x.tags?.artist || "").toLowerCase() ===
+              (tr.artist || "").toLowerCase();
+
+            return xFilename === trFilename && titleMatch && artistMatch;
+          });
+        }
+
+        if (meta) {
+          // meta is the track object found in catalog
+          let imgPath =
+            meta?.artUrl ?? meta?.tags?.coverUrl ?? meta?.coverUrl ?? null;
+          imgPath = imgPath.replace(/\\/g, "/");
+          // If it’s a root-relative path (/album-art/... or /files/...), make it absolute:
+          if (imgPath.startsWith("/")) {
+            imgPath = SERVER_URL + imgPath;
+          }
+
+          if (!window.viewerWin || window.viewerWin.closed) {
+            window.viewerWin = window.open(
+              "/viewer.html",
+              "NowPlaying",
+              "width=400,height=600"
+            );
+          }
+
+          setTimeout(() => {
+            window.viewerWin?.postMessage(
+              {
+                tags: meta,
+                artUrl: imgPath,
+                role: PLAN.tandas[idx]?.role || null,
+              },
+              "*"
+            );
+          }, 300);
+
+          const url = streamUrl(tr.id);
+          // robust (re)bind
+          player.pause();
+          player.src = url;
+          player.load(); // ensure the new src is taken
+          player.play().catch(() => {});
+
+          const label = isCortinaBlock(blk)
+            ? `Cortina ${idx + 1} — ${tr.title}`
+            : `Tanda ${idx + 1} (${blk.style}) — ${tr.title}${
+                tr.artist ? " — " + tr.artist : ""
+              }`;
+
+          setNowLabel(label);
+          highlightNow(idx);
+        }
+      }
+
+      function highlightNow(idx) {
+        // Card-level highlight
+        document.querySelectorAll(".card").forEach((el, i) => {
+          if (i === idx) el.classList.add("now");
+          else el.classList.remove("now");
+        });
+
+        // Track-row highlight inside the current card
+        document
+          .querySelectorAll(".track.playing")
+          .forEach((el) => el.classList.remove("playing"));
+        if (idx >= 0) {
+          const card = document.querySelector(`.card[data-index="${idx}"]`);
+          const rows = card ? card.querySelectorAll(".track") : [];
+          const row = rows[curTrackOffset] || null;
+          if (row) {
+            row.classList.add("playing");
+            // Optional tiny pill “Playing”
+            if (!row.querySelector(".play-pill")) {
+              const pill = document.createElement("span");
+              pill.className = "play-pill";
+              pill.textContent = "Playing";
+              // put it at the right side next to BPM/key (second div)
+              row.lastElementChild?.appendChild(pill);
+            }
+          }
+        }
+      }
+
+      function next() {
+        if (!PLAN) return;
+        const blk = PLAN.tandas[curIdx];
+        if (blk?.type === "tanda") {
+          if (curTrackOffset + 1 < blk.tracks.length) {
+            curTrackOffset += 1;
+            playBlock(curIdx);
+            return;
+          } else {
+            curTrackOffset = 0;
+            if (curIdx + 1 < PLAN.tandas.length) {
+              playBlock(curIdx + 1);
+              return;
+            }
+          }
+        } else {
+          if (curIdx + 1 < PLAN.tandas.length) {
+            playBlock(curIdx + 1);
+            return;
+          }
+        }
+        setNowLabel("End of plan");
+        player.pause();
+      }
+
+      function playPause() {
+        if (player.paused) player.play().catch(() => {});
+        else player.pause();
+      }
+
+      function startPlan() {
+        if (!PLAN) return;
+        curTrackOffset = 0;
+        let idx = 0;
+        if (isCortinaBlock(PLAN.tandas[0]) && PLAN.tandas.length > 1) idx = 1;
+        idx = 1;
+        playBlock(idx);
+      }
+
+      // Timeline counters
+      setInterval(() => {
+        if (!PLAN) {
+          elapsedEl.textContent = "0:00";
+          remainingEl.textContent = "0:00";
+          return;
+        }
+        const audioT = isFinite(player.currentTime) ? player.currentTime : 0;
+        let priorMin = 0;
+        for (let i = 0; i < PLAN.tandas.length; i++) {
+          if (i < curIdx) priorMin += PLAN.tandas[i].approxMinutes || 0;
+          else break;
+        }
+        const currMin = audioT / 60;
+        const elapsed = priorMin + currMin;
+        const remaining = Math.max(0, (PLAN.totalMinutes || 0) - elapsed);
+        elapsedEl.textContent = fmtMin(elapsed);
+        remainingEl.textContent = fmtMin(remaining);
+      }, 1000);
+
+      // Events & buttons
+      player.addEventListener("ended", next);
+      $("#tanda-gen").onclick = tandaPlanner;
+      $("#genplan").onclick = agentGeneratePlan;
+      $("#review").onclick = async () => {
+        if (!PLAN) return;
+        const res = await fetch("/api/agent/review", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: PLAN }),
+        });
+        const data = await res.json();
+        alert(data.notes || "Agent done.");
+      };
+      $("#swap").onclick = () => {
+        if (swapFirst === null)
+          alert("Click 'Select' on two tanda cards to swap.");
+      };
+      $("#next").onclick = next;
+      $("#pause").onclick = playPause;
+
+      // Auto-generate deterministic plan on load; then you can start playback
+      generatePlan().then(startPlan);
+
+      // Expose tanda Planner globally for the header button's onclick
+      window.tandaPlanner = tandaPlanner;
+    </script>
+  </body>
+</html>

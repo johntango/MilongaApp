@@ -1,0 +1,313 @@
+{
+  "id": "7fd2a7bc927a",
+  "name": "battonRouge",
+  "createdAt": "2025-10-29T19:43:47.445Z",
+  "plan": {
+    "tandas": [
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 01 - Tierra Negra.mp3",
+            "title": "Tierra Negra",
+            "artist": "Carlos Di Sarli",
+            "BPM": 125.3,
+            "Energy": -16.05849266052246,
+            "Key": "G",
+            "camelotKey": "9B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 02 - Griseta.mp3",
+            "title": "Griseta",
+            "artist": "Carlos Di Sarli",
+            "BPM": 131.8,
+            "Energy": -16.93744468688965,
+            "Key": "F",
+            "camelotKey": "7B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 03 - Nido Gaucho.mp3",
+            "title": "Nido Gaucho",
+            "artist": "Carlos Di Sarli",
+            "BPM": 114.9,
+            "Energy": -16.657073974609375,
+            "Key": "Bb",
+            "camelotKey": "6B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 06 - Cosas Olvidadas.mp3",
+            "title": "Cosas Olvidadas",
+            "artist": "Carlos Di Sarli",
+            "BPM": 130,
+            "Energy": -16.7016544342041,
+            "Key": "Ab",
+            "camelotKey": "4B",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "title": "I'm Beginning to See the Light",
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Chantal Chamberland/Dripping Indigo/07 - I'm Beginning to See the Light.mp3",
+        "approxMinutes": 1
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Pugliese/La Tupungatina/03 - La Cachila.mp3",
+            "title": "La Cachila",
+            "artist": "Osvaldo Pugliese",
+            "BPM": 111,
+            "Energy": -17.175277709960938,
+            "Key": "Fm",
+            "camelotKey": "4A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Pugliese/Serie De Oro Vol 2_ Osvaldo Pugliese/07 - La Abandoné Y No Sabía.mp3",
+            "title": "La Abandoné Y No Sabía",
+            "artist": "Osvaldo Pugliese",
+            "BPM": 126.4,
+            "Energy": -16.261728286743164,
+            "Key": "Fm",
+            "camelotKey": "4A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Pugliese/Grandes Del Tango 9/15 - La Cieguita.mp3",
+            "title": "La Cieguita",
+            "artist": "Osvaldo Pugliese",
+            "BPM": 136.8,
+            "Energy": -15.650869369506836,
+            "Key": "Fm",
+            "camelotKey": "4A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Pugliese/La Tupungatina/09 - Nueve de Julio.mp3",
+            "title": "Nueve de Julio",
+            "artist": "Osvaldo Pugliese",
+            "BPM": 116.2,
+            "Energy": -17.00128173828125,
+            "Key": "G",
+            "camelotKey": "9B",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "title": "Lover Man",
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Chantal Chamberland/Dripping Indigo/08 - Lover Man.mp3",
+        "approxMinutes": 1
+      },
+      {
+        "type": "tanda",
+        "style": "Vals",
+        "size": 3,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 05 Que Lejos Que Estoy.mp3",
+            "title": "Que Lejos Que Estoy",
+            "artist": "Enrique Rodriguez",
+            "BPM": 123.7,
+            "Energy": -17.179079055786133,
+            "Key": "A",
+            "camelotKey": "11B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 09 Pues Quien lo Tiene-.mp3",
+            "title": "Pues Quien lo Tiene?",
+            "artist": "Enrique Rodriguez",
+            "BPM": 161.3,
+            "Energy": -17.21436309814453,
+            "Key": "D",
+            "camelotKey": "10B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/26 grandes tangos/02 - Tengo mil novias.mp3",
+            "title": "Tengo mil novias",
+            "artist": "Enrique Rodriguez cantan A...",
+            "album": "26 grandes tangos",
+            "BPM": 171.1,
+            "Energy": -17.334924697875977,
+            "Key": "G",
+            "camelotKey": "9B",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "title": "Les Cinemas - Bars",
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Chantal Chamberland/Dripping Indigo/09 - Les Cinemas - Bars.mp3",
+        "approxMinutes": 1
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/TANGOCLUB - Buenos Aires - ARGENTINA/Ignacio Corsini - Carro viejo.mp3",
+            "title": "Carro Viejo",
+            "artist": "Alfredo de Angelis",
+            "BPM": 158.9,
+            "Energy": -16.440980911254883,
+            "Key": "G",
+            "camelotKey": "9B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetín de Buenos Aires, Vol. 4 - El Entrerriano/16 - Cuando Llora la Milonga.mp3",
+            "title": "Cuando Llora la Milonga",
+            "artist": "Alfredo de Angelis",
+            "BPM": 126.1,
+            "Energy": -16.50945472717285,
+            "Key": "G",
+            "camelotKey": "9B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/(Disc 2) 07 - Parece Un Cuento.mp3",
+            "title": "Parece Un Cuento",
+            "artist": "Alfredo de Angelis",
+            "BPM": 140.6,
+            "Energy": -16.050931930541992,
+            "Key": "G",
+            "camelotKey": "9B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/11 - Mano A Mano.mp3",
+            "title": "Mano A Mano",
+            "artist": "Alfredo de Angelis",
+            "BPM": 158.6,
+            "Energy": -16.175085067749023,
+            "Key": "G",
+            "camelotKey": "9B",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "title": "Hot Night in Baton Rouge",
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Chantal Chamberland/Dripping Indigo/15 - Hot Night in Baton Rouge.mp3",
+        "approxMinutes": 1
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Demare/Grandes Del Tango 27/05 - Ropa Blanca.mp3",
+            "title": "Ropa Blanca",
+            "artist": "Lucio Demare",
+            "BPM": 144.5,
+            "Energy": -15.619354248046875,
+            "Key": "G",
+            "camelotKey": "9B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Demare/Grandes Del Tango 27/10 - El Baile De Los Domingos.mp3",
+            "title": "El Baile De Los Domingos",
+            "artist": "Lucio Demare",
+            "BPM": 138.1,
+            "Energy": -16.17107582092285,
+            "Key": "D",
+            "camelotKey": "10B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Demare/Grandes Del Tango 27/18 - Y Siempre Igual.mp3",
+            "title": "Y Siempre Igual",
+            "artist": "Lucio Demare",
+            "BPM": 131.9,
+            "Energy": -16.7885684967041,
+            "Key": "D",
+            "camelotKey": "10B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Demare/GrandesDelTango27-Disc2/(Disc 2) 08 - En Un Rincón.mp3",
+            "title": "En Un Rincón",
+            "artist": "Lucio Demare",
+            "BPM": 139.3,
+            "Energy": -16.7462158203125,
+            "Key": "C",
+            "camelotKey": "8B",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "title": "How Deep Is Your Love",
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Chantal Chamberland/Dripping Indigo/06 - How Deep Is Your Love.mp3",
+        "approxMinutes": 1
+      },
+      {
+        "type": "tanda",
+        "style": "Milonga",
+        "size": 3,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Caló/Al Compas Del Corazon/12 Milonga antigua.mp3",
+            "title": "Milonga antigua",
+            "artist": "Miguel Caló",
+            "BPM": 145.4,
+            "Energy": -16.610429763793945,
+            "Key": "Bbm",
+            "camelotKey": "3A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Caló/Tango Classics 225 Trasnochando/01-10- Azabache.mp3",
+            "title": "Azabache",
+            "artist": "Miguel Caló",
+            "BPM": 176.1,
+            "Energy": -16.945035934448242,
+            "Key": "Fm",
+            "camelotKey": "4A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Caló/Tango Classics 225 Trasnochando/01-03- Milonga Que Peina Canas.mp3",
+            "title": "Milonga que peina canas",
+            "artist": "Miguel Calo , Raul Beron",
+            "album": "Milonga que peina canas Milonga que peina canas (Milonga Vol. 3)",
+            "BPM": 161.6,
+            "Energy": -16.623483657836914,
+            "Key": "Cm",
+            "camelotKey": "5A",
+            "seconds": 0
+          }
+        ]
+      }
+    ],
+    "totalMinutes": 71
+  },
+  "meta": {
+    "version": 1
+  }
+}

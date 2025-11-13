@@ -1,0 +1,395 @@
+{
+  "id": "4bdd11cb265f",
+  "name": "countryCortinas",
+  "createdAt": "2025-11-07T19:50:25.733Z",
+  "plan": {
+    "tandas": [
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/(Disc 2) 07 - Parece Un Cuento.mp3",
+            "title": "Parece Un Cuento",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 140.6,
+            "Energy": -16.050931930541992,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/(Disc 2) 06 - Amigazo.mp3",
+            "title": "Amigazo",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 126,
+            "Energy": -16.577503204345703,
+            "Key": "F",
+            "camelotKey": "7B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/(Disc 2) 12 - Carro Viejo.mp3",
+            "title": "Carro Viejo",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 158.9,
+            "Energy": -16.440980911254883,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": null,
+            "title": "replace this",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 1/14 - The American Dream.mp3",
+            "title": "The American Dream",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 1/14 - The American Dream.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "The American Dream"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/(Disc 2) 05 - Ventanita De Arrabal.mp3",
+            "title": "Ventanita De Arrabal",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 125.3,
+            "Energy": -15.689868927001953,
+            "Key": "F#m",
+            "camelotKey": "11A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/(Disc 2) 19 - Un Tango Argentino.mp3",
+            "title": "Un Tango Argentino",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 139.3,
+            "Energy": -16.043909072875977,
+            "Key": "F#m",
+            "camelotKey": "11A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/01 - Corrientes Y Esmeralda.mp3",
+            "title": "Corrientes Y Esmeralda",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 115.9,
+            "Energy": -16.749046325683594,
+            "Key": "Em",
+            "camelotKey": "9A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Tangos Con Armando Moreno/Tangos Con Armando Moreno 02 La VI Llegar.mp3",
+            "title": "La VI Llegar",
+            "artist": "Enrique Rodriguez",
+            "album": "Tangos Con Armando Moreno",
+            "BPM": 115.9,
+            "Energy": -16.2542781829834,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 2/(Disc 2) 04 - Man Of Steel.mp3",
+            "title": "Man Of Steel",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 2/(Disc 2) 04 - Man Of Steel.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Man Of Steel"
+      },
+      {
+        "type": "tanda",
+        "style": "Vals",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 05 Que Lejos Que Estoy.mp3",
+            "title": "Que Lejos Que Estoy",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 123.7,
+            "Energy": -17.179079055786133,
+            "Key": "A",
+            "camelotKey": "11B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 09 Pues Quien lo Tiene-.mp3",
+            "title": "Pues Quien lo Tiene?",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 161.3,
+            "Energy": -17.21436309814453,
+            "Key": "D",
+            "camelotKey": "10B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 08 Maja Aristocratica.mp3",
+            "title": "Maja Aristocratica",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 165.2,
+            "Energy": -16.994827270507812,
+            "Key": "F#",
+            "camelotKey": "2B"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Hank Williams, Sr/24 Greatest/24 Greatest 14 Wedding Bells.mp3",
+            "title": "Wedding Bells",
+            "artist": "Hank Williams",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Hank Williams, Sr/24 Greatest/24 Greatest 14 Wedding Bells.mp3",
+        "artist": "Hank Williams",
+        "singer": null,
+        "title": "Wedding Bells"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 9/04 - Nueve Puntos.mp3",
+            "title": "Nueve Puntos",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 174,
+            "Energy": -16.420846939086914,
+            "Key": "E",
+            "camelotKey": "12B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 9/05 - Viviani.mp3",
+            "title": "Viviani",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 161.8,
+            "Energy": -15.66891860961914,
+            "Key": "C#m",
+            "camelotKey": "12A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 8/09 - El Jaguël.mp3",
+            "title": "El Jaguël",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 174.9,
+            "Energy": -16.079784393310547,
+            "Key": "B",
+            "camelotKey": "1B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 9/06 - Germain.mp3",
+            "title": "Germain",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 193.2,
+            "Energy": -16.42221450805664,
+            "Key": "Gm",
+            "camelotKey": "6A"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Various Artists/The British Invasion- History of British Rock, Vol. 4/The British Invasion- History of British Rock, Vol. 4 07 Universal Soldier.mp3",
+            "title": "Universal Soldier",
+            "artist": "Donovan",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Various Artists/The British Invasion- History of British Rock, Vol. 4/The British Invasion- History of British Rock, Vol. 4 07 Universal Soldier.mp3",
+        "artist": "Donovan",
+        "singer": null,
+        "title": "Universal Soldier"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/09 - Besame En La Boca.mp3",
+            "title": "Besame En La Boca",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 149.4,
+            "Energy": -16.713041305541992,
+            "Key": "Gm",
+            "camelotKey": "6A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 42 - Alfredo De Angelis 3/(Disc 2) 01 - La Cumparsita.mp3",
+            "title": "La Cumparsita",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 160,
+            "Energy": -16.384864807128906,
+            "Key": "Gm",
+            "camelotKey": "6A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 20 - Alfredo De Angelis 2/19 - Como Nos Cambia La Vida.mp3",
+            "title": "Como Nos Cambia La Vida",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 149.2,
+            "Energy": -16.82684326171875,
+            "Key": "Gm",
+            "camelotKey": "6A"
+          },
+          {
+            "id": null,
+            "title": "replace this",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Beatles/Past Masters, Vol. 1/Past Masters, Vol. 1 10 Long Tall Sally.mp3",
+            "title": "Long Tall Sally",
+            "artist": "The Beatles",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Beatles/Past Masters, Vol. 1/Past Masters, Vol. 1 10 Long Tall Sally.mp3",
+        "artist": "The Beatles",
+        "singer": null,
+        "title": "Long Tall Sally"
+      },
+      {
+        "type": "tanda",
+        "style": "Milonga",
+        "size": 3,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/12 Tremolina.mp3",
+            "title": "Tremolina",
+            "artist": "Color Tango",
+            "album": "Con estilo para bailar, volumen 1",
+            "BPM": 113.9,
+            "Energy": -17.05388069152832,
+            "Key": "D",
+            "camelotKey": "10B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Milonga Vieja Milonga/01-02- El portenito.mp3",
+            "title": "El portenito",
+            "artist": "Angel D`Agostino Y Su Orquesta Tipica (Singer: Angel Vargas)",
+            "album": "Milonga Vieja Milonga",
+            "BPM": 145,
+            "Energy": -16.59906578063965,
+            "Key": "D",
+            "camelotKey": "10B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/(Disc 2) 17 - Del Buenos Aires De Ayer (Milonga).mp3",
+            "title": "Del Buenos Aires De Ayer (Milonga)",
+            "artist": "Ángel Vargas",
+            "album": "Grandes Del Tango 30 - Ángel Vargas 2",
+            "BPM": 149.7,
+            "Energy": -16.615428924560547,
+            "Key": "Am",
+            "camelotKey": "8A",
+            "seconds": 0
+          }
+        ]
+      }
+    ],
+    "totalMinutes": 71
+  },
+  "meta": {
+    "version": 1
+  }
+}

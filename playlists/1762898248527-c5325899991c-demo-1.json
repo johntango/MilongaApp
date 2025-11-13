@@ -1,0 +1,435 @@
+{
+  "id": "c5325899991c",
+  "name": "Demo 1",
+  "createdAt": "2025-11-11T21:57:28.527Z",
+  "plan": {
+    "tandas": [
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "role": "classic",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/03 Pasta Ancha.mp3",
+            "title": "Pasta Ancha",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 127.5,
+            "Energy": -17.347200393676758,
+            "Key": "Am",
+            "camelotKey": "8A",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/09 Nagracha.mp3",
+            "title": "Nagracha",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 140.4,
+            "Energy": -17.459877014160156,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/10 El Andariego.mp3",
+            "title": "El Andariego",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 117.1,
+            "Energy": -16.93684196472168,
+            "Key": "D",
+            "camelotKey": "10B",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/05 Ilusion De Mi Vida.mp3",
+            "title": "Ilusion De Mi Vida",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 145,
+            "Energy": -17.506805419921875,
+            "Key": "A",
+            "camelotKey": "11B",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 1/05 - Women I've Never Had.mp3",
+            "title": "Women I've Never Had",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 1/05 - Women I've Never Had.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Women I've Never Had"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "role": "classic",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/GreatestTangoCollectionEver Disc1/02 - Mi Buenos Aires Querido.mp3",
+            "title": "Mi Buenos Aires Querido",
+            "artist": "Carlos Gardel",
+            "seconds": 0,
+            "BPM": 121.1,
+            "Energy": -15.980918884277344,
+            "Key": "B",
+            "camelotKey": "1B",
+            "artUrl": "/album-art/grandes-del-tango-29-francisco-canaro-vol-2-carlos-gardel.jpg",
+            "year": 2009
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/GreatestTangoCollectionEver Disc1/09 - Volver.mp3",
+            "title": "Volver",
+            "artist": "Carlos Gardel",
+            "seconds": 0,
+            "BPM": 116.4,
+            "Energy": -16.09352684020996,
+            "Key": "C#",
+            "camelotKey": "3B",
+            "artUrl": "/album-art/grandes-del-tango-29-francisco-canaro-vol-2-carlos-gardel.jpg",
+            "year": 2009
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Canaro/Grandes del Tango 29 Francisco Canaro Vol 2/07 Viejo Rincon.mp3",
+            "title": "Viejo Rincon",
+            "artist": "Carlos Gardel",
+            "seconds": 0,
+            "BPM": 137.4,
+            "Energy": -15.467581748962402,
+            "Key": "C#",
+            "camelotKey": "3B",
+            "artUrl": "/album-art/grandes-del-tango-29-francisco-canaro-vol-2-carlos-gardel.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Canaro/Grandes del Tango 29 Francisco Canaro Vol 2/10 Silencio.mp3",
+            "title": "Silencio",
+            "artist": "Carlos Gardel",
+            "seconds": 0,
+            "BPM": 127,
+            "Energy": -15.91757869720459,
+            "Key": "Cm",
+            "camelotKey": "5A",
+            "artUrl": "/album-art/grandes-del-tango-29-francisco-canaro-vol-2-carlos-gardel.jpg",
+            "year": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 3/Singles Collection- The London Years Disc 3 04 Honky Tonk Women.mp3",
+            "title": "Honky Tonk Women",
+            "artist": "The Rolling Stones",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 3/Singles Collection- The London Years Disc 3 04 Honky Tonk Women.mp3",
+        "artist": "The Rolling Stones",
+        "singer": null,
+        "title": "Honky Tonk Women"
+      },
+      {
+        "type": "tanda",
+        "style": "Vals",
+        "role": "rich",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/DiSARLI/Carlos Di Sarli con Roberto Rufino - Alma mía.mp3",
+            "title": "Alma mía",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 115.7,
+            "Energy": -17.04776954650879,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "artUrl": "/album-art/TempCarlos-di-Sarli-Grisetta.png",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 14 - Alma Mía.mp3",
+            "title": "Alma mía",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 115.7,
+            "Energy": -17.04776954650879,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "artUrl": "/album-art/TempCarlos-di-Sarli-Grisetta.png",
+            "year": null
+          },
+          {
+            "id": null,
+            "title": "replace this",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "artUrl": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Hank Williams, Sr/24 Greatest/24 Greatest 06 Kaw-Liga.mp3",
+            "title": "Kaw-Liga",
+            "artist": "Hank Williams",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Hank Williams, Sr/24 Greatest/24 Greatest 06 Kaw-Liga.mp3",
+        "artist": "Hank Williams",
+        "singer": null,
+        "title": "Kaw-Liga"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "role": "rich",
+        "size": 4,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Fernanda Cajide/DonJuan.mp3",
+            "title": "Unknown",
+            "artist": null,
+            "album": "MIx Songs",
+            "BPM": 203.4,
+            "Energy": -15.841703414916992,
+            "Key": "E",
+            "camelotKey": "12B",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Fernanda Cajide/Track01.mp3",
+            "title": "Unknown",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 203.4,
+            "Energy": -15.841703414916992,
+            "Key": "E",
+            "camelotKey": "12B",
+            "artUrl": null,
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Fernanda Cajide/Track03.mp3",
+            "title": "Unknown",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 203.4,
+            "Energy": -15.841703414916992,
+            "Key": "E",
+            "camelotKey": "12B",
+            "artUrl": null,
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Fernanda Cajide/Track04.mp3",
+            "title": "Unknown",
+            "artist": null,
+            "album": "MIx Songs",
+            "BPM": 203.4,
+            "Energy": -15.841703414916992,
+            "Key": "E",
+            "camelotKey": "12B",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Fleetwood Mac/Rumours/Rumours 04 Don't Stop.mp3",
+            "title": "Don't Stop",
+            "artist": "Fleetwood Mac",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Fleetwood Mac/Rumours/Rumours 04 Don't Stop.mp3",
+        "artist": "Fleetwood Mac",
+        "singer": null,
+        "title": "Don't Stop"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "role": "modern",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 03 Con Permiso Senorita.mp3",
+            "title": "Con Permiso Senorita",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 162.6,
+            "Energy": -17.098207473754883,
+            "Key": "D",
+            "camelotKey": "10B",
+            "artUrl": "/album-art/tango-collection-enrique-rodriguez.jpg",
+            "year": 2005
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 07 Te Quiero Ver Escopeta.mp3",
+            "title": "Te Quiero Ver Escopeta",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 157.9,
+            "Energy": -16.886859893798828,
+            "Key": "D",
+            "camelotKey": "10B",
+            "artUrl": "/album-art/tango-collection-enrique-rodriguez.jpg",
+            "year": 2005
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 14 Esto Es Puro Compas.mp3",
+            "title": "Esto Es Puro Compas",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 162.5,
+            "Energy": -16.843408584594727,
+            "Key": "D",
+            "camelotKey": "10B",
+            "artUrl": "/album-art/tango-collection-enrique-rodriguez.jpg",
+            "year": 2005
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Tangos Con Armando Moreno/Tangos Con Armando Moreno 04 A Media Luz.mp3",
+            "title": "A Media Luz",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 171.4,
+            "Energy": -16.117938995361328,
+            "Key": "D",
+            "camelotKey": "10B",
+            "artUrl": "/album-art/tangos-con-armando-moreno-enrique-rodriguez.jpg",
+            "year": 2002
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 12 - Everything Comes Down To Money And Love.mp3",
+            "title": "Everything Comes Down To Money And Love",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 12 - Everything Comes Down To Money And Love.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Everything Comes Down To Money And Love"
+      },
+      {
+        "type": "tanda",
+        "style": "Milonga",
+        "role": "alt",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": null,
+            "title": "replace this",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "artUrl": null
+          },
+          {
+            "id": null,
+            "title": "replace this",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "artUrl": null
+          },
+          {
+            "id": null,
+            "title": "replace this",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "artUrl": null
+          }
+        ]
+      }
+    ],
+    "totalMinutes": 71
+  },
+  "meta": {
+    "version": 1
+  }
+}

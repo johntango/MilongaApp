@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Now Playing</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 1rem;
+        background: #111;
+        color: #eee;
+      }
+      img {
+        width: 500px;
+        height: auto;
+        margin-bottom: 1rem;
+      }
+      .meta {
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="meta" id="meta"></div>
+    <img id="cover" src="" alt="Album Art" />
+    <script>
+      window.addEventListener("message", (event) => {
+        const { tags, artUrl } = event.data;
+        if (!tags) return;
+
+        document.getElementById("cover").src = artUrl;
+
+        const lines = [
+          `<h1>${tags.tags.title}</h1`,
+          ` <h1> ${tags.tags.artist} </h1`,
+          ` <h3> ${tags.tags.album} </h3`,
+        ];
+
+        document.getElementById("meta").innerHTML = lines.join("<br>");
+      });
+    </script>
+  </body>
+</html>

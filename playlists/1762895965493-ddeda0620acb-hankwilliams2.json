@@ -1,0 +1,395 @@
+{
+  "id": "ddeda0620acb",
+  "name": "HankWilliams2",
+  "createdAt": "2025-11-11T21:19:25.493Z",
+  "plan": {
+    "tandas": [
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 7/01 - Comme Il Faut.mp3",
+            "title": "Comme Il Faut",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 204.8,
+            "Energy": -16.698284149169922,
+            "Key": "Am",
+            "camelotKey": "8A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 7/03 - El Once.mp3",
+            "title": "El Once",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 183.3,
+            "Energy": -15.993243217468262,
+            "Key": "A",
+            "camelotKey": "11B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 8/08 - Rodrigues Peña.mp3",
+            "title": "Rodrigues Peña",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 187.5,
+            "Energy": -15.872577667236328,
+            "Key": "A",
+            "camelotKey": "11B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 9/04 - Nueve Puntos.mp3",
+            "title": "Nueve Puntos",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 174,
+            "Energy": -16.420846939086914,
+            "Key": "E",
+            "camelotKey": "12B"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Hank Williams, Sr/24 Greatest/24 Greatest 02 Move It on Over.mp3",
+            "title": "Move It on Over",
+            "artist": "Hank Williams",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Hank Williams, Sr/24 Greatest/24 Greatest 02 Move It on Over.mp3",
+        "artist": "Hank Williams",
+        "singer": null,
+        "title": "Move It on Over"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/01 - Como nos cambia la vida.mp3",
+            "title": "Como nos cambia la vida",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 146.5,
+            "Energy": -17.010061264038086,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/03 - Bailarin compadrito.mp3",
+            "title": "Bailarin compadrito",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 144.8,
+            "Energy": -17.25041389465332,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Como nos cambia la vida/08 - Flor de fango.mp3",
+            "title": "Flor de fango",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 143,
+            "Energy": -16.41925048828125,
+            "Key": "Cm",
+            "camelotKey": "5A",
+            "seconds": 0
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/14 - Llevatelo todo.mp3",
+            "title": "Llevatelo todo",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 143.9,
+            "Energy": -16.542367935180664,
+            "Key": "Cm",
+            "camelotKey": "5A",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 10 I Just Want to Make Love to You.mp3",
+            "title": "I Just Want to Make Love to You",
+            "artist": "The Rolling Stones",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 10 I Just Want to Make Love to You.mp3",
+        "artist": "The Rolling Stones",
+        "singer": null,
+        "title": "I Just Want to Make Love to You"
+      },
+      {
+        "type": "tanda",
+        "style": "Vals",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 05 Que Lejos Que Estoy.mp3",
+            "title": "Que Lejos Que Estoy",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 123.7,
+            "Energy": -17.179079055786133,
+            "Key": "A",
+            "camelotKey": "11B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 09 Pues Quien lo Tiene-.mp3",
+            "title": "Pues Quien lo Tiene?",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 161.3,
+            "Energy": -17.21436309814453,
+            "Key": "D",
+            "camelotKey": "10B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 08 Maja Aristocratica.mp3",
+            "title": "Maja Aristocratica",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 165.2,
+            "Energy": -16.994827270507812,
+            "Key": "F#",
+            "camelotKey": "2B"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Various Artists/The British Invasion- History of British Rock, Vol. 2/The British Invasion- History of British Rock, Vol. 2 01 All Day and All of the Night.mp3",
+            "title": "All Day and All of the Night",
+            "artist": "The Kinks",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Various Artists/The British Invasion- History of British Rock, Vol. 2/The British Invasion- History of British Rock, Vol. 2 01 All Day and All of the Night.mp3",
+        "artist": "The Kinks",
+        "singer": null,
+        "title": "All Day and All of the Night"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 15 - Sombras Del Puerto.mp3",
+            "title": "Sombras del Puerto",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 130.2,
+            "Energy": -16.07818603515625,
+            "Key": "Em",
+            "camelotKey": "9A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Porteno y Bailarin/12 - Clavel del Aire.mp3",
+            "title": "Clavel del Aire",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 110.9,
+            "Energy": -16.67678451538086,
+            "Key": "Em",
+            "camelotKey": "9A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Porteno y Bailarin/07 - Asi Era Mi Novia.mp3",
+            "title": "Asi Era Mi Novia",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 196.6,
+            "Energy": -16.576066970825195,
+            "Key": "Bb",
+            "camelotKey": "6B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Porteno y Bailarin/11 - Tu Intimo Secreto.mp3",
+            "title": "Tu Intimo Secreto",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 131.8,
+            "Energy": -16.801136016845703,
+            "Key": "Bb",
+            "camelotKey": "6B"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 1/08 - Texas Women.mp3",
+            "title": "Texas Women",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 1/08 - Texas Women.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Texas Women"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetín de Buenos Aires, Vol. 4 - El Entrerriano/01 - La Cumparsita.mp3",
+            "title": "La Cumparsita",
+            "artist": "Anibal Troilo Y Su Orquesta Tipica",
+            "seconds": 0,
+            "BPM": 206.8,
+            "Energy": -16.66720199584961,
+            "Key": "Gm",
+            "camelotKey": "6A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetín de Buenos Aires, Vol. 4 - El Entrerriano/03 - Mi Noche Triste.mp3",
+            "title": "Mi Noche Triste",
+            "artist": "Anibal Troilo Y Su Orquesta Tipica",
+            "seconds": 0,
+            "BPM": 114.7,
+            "Energy": -16.64899253845215,
+            "Key": "Am",
+            "camelotKey": "8A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetín de Buenos Aires, Vol. 1 - Vuyo Verde/01 - Tinta Roja.mp3",
+            "title": "Tinta Roja",
+            "artist": "Anibal Troilo Y Su Orquesta Tipica",
+            "seconds": 0,
+            "BPM": 147.3,
+            "Energy": -16.839984893798828,
+            "Key": "Am",
+            "camelotKey": "8A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetín de Buenos Aires, Vol. 4 - El Entrerriano/02 - Inspiración.mp3",
+            "title": "Inspiración",
+            "artist": "Anibal Troilo Y Su Orquesta Tipica",
+            "seconds": 0,
+            "BPM": 120.1,
+            "Energy": -16.60638427734375,
+            "Key": "Cm",
+            "camelotKey": "5A"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 13 - I Ain't Goin' Peacefully.mp3",
+            "title": "I Ain't Goin' Peacefully",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 13 - I Ain't Goin' Peacefully.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "I Ain't Goin' Peacefully"
+      },
+      {
+        "type": "tanda",
+        "style": "Milonga",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/(Disc 2) 07 - Apología Tanguera (Milonga).mp3",
+            "title": "Apología Tanguera (Milonga)",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 131,
+            "Energy": -16.82096290588379,
+            "Key": "Cm",
+            "camelotKey": "5A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/10 - Milonga Que Viene Al Tranco.mp3",
+            "title": "Milonga Que Viene Al Tranco",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 119.4,
+            "Energy": -16.828622817993164,
+            "Key": "Em",
+            "camelotKey": "9A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/(Disc 2) 17 - Del Buenos Aires De Ayer (Milonga).mp3",
+            "title": "Del Buenos Aires De Ayer (Milonga)",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 149.7,
+            "Energy": -16.615428924560547,
+            "Key": "Am",
+            "camelotKey": "8A"
+          }
+        ]
+      }
+    ],
+    "totalMinutes": 71
+  },
+  "meta": {
+    "version": 1
+  }
+}

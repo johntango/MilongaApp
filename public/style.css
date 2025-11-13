@@ -1,0 +1,272 @@
+     :root {
+        --bg: #0b0f15;
+        --card: #121825;
+        --muted: #93a2b8;
+        --fg: #e6eef8;
+        --accent: #5eead4;
+        --warn: #f59e0b;
+        --danger: #ef4444;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 14px/1.4 system-ui, Segoe UI, Roboto, Helvetica, Arial;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid #1e293b;
+        background: #0d1320;
+      }
+      h1 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      button.tiny {
+        padding: 2px 6px;
+        font-size: 12px;
+        margin-left: 6px;
+      }
+      button.danger {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      button,
+      select {
+        background: #1f2937;
+        color: var(--fg);
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      button:hover {
+        border-color: #475569;
+      }
+      .page {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 12px;
+        padding: 12px;
+      }
+      .panel {
+        background: var(--card);
+        border: 1px solid #1e293b;
+        border-radius: 12px;
+        padding: 12px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .timeline {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+      }
+      .card {
+        background: #0f172a;
+        border: 1px solid #1f2937;
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        border: 1px solid #334155;
+        background: #0b1220;
+      }
+      .style-Tango {
+        border-color: #2563eb;
+        color: #93c5fd;
+      }
+      .style-Vals {
+        border-color: #10b981;
+        color: #a7f3d0;
+      }
+      .style-Milonga {
+        border-color: #f59e0b;
+        color: #fde68a;
+      }
+      .track {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        background: #0b1220;
+      }
+      .track.playing {
+        outline: 2px solid var(--accent);
+        background: #0f1b2e;
+      }
+      .track .play-pill {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 2px 6px;
+        border: 1px solid #334155;
+        border-radius: 999px;
+        font-size: 11px;
+        color: var(--accent);
+      }
+
+      .track small {
+        color: var(--muted);
+      }
+      .now {
+        outline: 2px solid var(--accent);
+      }
+      .cortina {
+        background: #111827;
+        border: 1px dashed #374151;
+      }
+      .swapSel {
+        outline: 2px dashed var(--warn);
+      }
+      .footer {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      audio {
+        width: 100%;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .space {
+        height: 8px;
+      }
+      .badge.busy {
+        border-color: var(--warn);
+        color: var(--warn);
+      }
+      .badge.ok {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .badge.err {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+
+      .log {
+        background: #0b1220;
+        border: 1px solid #1f2937;
+        border-radius: 8px;
+        padding: 8px;
+        height: 220px;
+        overflow: auto;
+        white-space: pre-wrap;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        color: var(--fg);
+      }
+      .log .time {
+        color: var(--muted);
+      }
+      .log .err {
+        color: var(--danger);
+      }
+      .log .phase {
+        color: var(--warn);
+      }
+      .log .ok {
+        color: var(--accent);
+      }
+      .log.llm {
+        height: 200px;
+      }
+
+      /* tiny spinner inline with badge text */
+      .spinner {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border: 2px solid #334155;
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-right: 6px;
+        vertical-align: -2px;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Retry button styling */
+      .retry-btn {
+        background: #065f46;
+        border-color: #10b981;
+        color: #d1fae5;
+        transition: all 0.2s;
+      }
+      .retry-btn:hover {
+        background: #047857;
+        border-color: #059669;
+      }
+      .retry-btn.problem {
+        background: #dc2626;
+        border-color: #f87171;
+        color: white;
+        animation: pulse-problem 2s infinite;
+      }
+      @keyframes pulse-problem {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+
+      /* Controls separator */
+      .separator {
+        color: var(--muted);
+        margin: 0 8px;
+        font-weight: normal;
+      }
+
+      /* Tanda library buttons */
+      .tanda-controls {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      
+      /* Save/Load tanda buttons */
+      button.tiny[title*="Save"] {
+        background: #059669;
+        border-color: #10b981;
+        color: white;
+      }
+      
+      button.tiny[title*="Load"] {
+        background: #0369a1;
+        border-color: #0ea5e9;
+        color: white;
+      }

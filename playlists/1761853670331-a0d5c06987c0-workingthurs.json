@@ -1,0 +1,383 @@
+{
+  "id": "a0d5c06987c0",
+  "name": "workingThurs",
+  "createdAt": "2025-10-30T19:47:50.331Z",
+  "plan": {
+    "tandas": [
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/TANGOCLUB - Buenos Aires - ARGENTINA/Ignacio Corsini - Carro viejo.mp3",
+            "title": "Carro Viejo",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 158.9,
+            "Energy": -16.440980911254883,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetín de Buenos Aires, Vol. 4 - El Entrerriano/16 - Cuando Llora la Milonga.mp3",
+            "title": "Cuando Llora la Milonga",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 126.1,
+            "Energy": -16.50945472717285,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/(Disc 2) 07 - Parece Un Cuento.mp3",
+            "title": "Parece Un Cuento",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 140.6,
+            "Energy": -16.050931930541992,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/03 - Pregonera.mp3",
+            "title": "Pregonera",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 136.5,
+            "Energy": -16.71992301940918,
+            "Key": "G",
+            "camelotKey": "9B"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 22 Get Off of My Cloud.mp3",
+            "title": "Get Off of My Cloud",
+            "artist": "The Rolling Stones",
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 22 Get Off of My Cloud.mp3",
+        "artist": "The Rolling Stones",
+        "singer": null,
+        "title": "Get Off of My Cloud"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 01 Si No Me Engana el Corazon.mp3",
+            "title": "Si No Me Engana el Corazon",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 160.1,
+            "Energy": -16.977930068969727,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 04 Mosterio.mp3",
+            "title": "Mosterio",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 176.7,
+            "Energy": -17.089197158813477,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 16 Solita y Sola.mp3",
+            "title": "Solita y Sola",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 155,
+            "Energy": -17.069272994995117,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 12 Todo VA Bien.mp3",
+            "title": "Todo VA Bien",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 190.9,
+            "Energy": -17.34601402282715,
+            "Key": "G",
+            "camelotKey": "9B"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 07 - Good Friends, Good Whiskey, Good Lovin'.mp3",
+            "title": "Good Friends, Good Whiskey, Good Lovin'",
+            "artist": "Hank Williams Jr.",
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 07 - Good Friends, Good Whiskey, Good Lovin'.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Good Friends, Good Whiskey, Good Lovin'"
+      },
+      {
+        "type": "tanda",
+        "style": "Vals",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 09 Pues Quien lo Tiene-.mp3",
+            "title": "Pues Quien lo Tiene?",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 161.3,
+            "Energy": -17.21436309814453,
+            "Key": "D",
+            "camelotKey": "10B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 05 Que Lejos Que Estoy.mp3",
+            "title": "Que Lejos Que Estoy",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 123.7,
+            "Energy": -17.179079055786133,
+            "Key": "A",
+            "camelotKey": "11B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 08 Maja Aristocratica.mp3",
+            "title": "Maja Aristocratica",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 165.2,
+            "Energy": -16.994827270507812,
+            "Key": "F#",
+            "camelotKey": "2B"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 07 - Good Friends, Good Whiskey, Good Lovin'.mp3",
+            "title": "Good Friends, Good Whiskey, Good Lovin'",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 07 - Good Friends, Good Whiskey, Good Lovin'.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Good Friends, Good Whiskey, Good Lovin'"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/(Disc 2) 09 - Así Es Ninon.mp3",
+            "title": "Así Es Ninon",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 128.5,
+            "Energy": -16.81902503967285,
+            "Key": "F",
+            "camelotKey": "7B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/02 - El Ciruja.mp3",
+            "title": "El Ciruja",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 145.3,
+            "Energy": -16.0074405670166,
+            "Key": "F",
+            "camelotKey": "7B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/12 - Chorra.mp3",
+            "title": "Chorra",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 163.6,
+            "Energy": -16.0566349029541,
+            "Key": "F",
+            "camelotKey": "7B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/13 - Pastora.mp3",
+            "title": "Pastora",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 132.3,
+            "Energy": -15.920659065246582,
+            "Key": "C",
+            "camelotKey": "8B"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 03 I Wanna Be Your Man.mp3",
+            "title": "I Wanna Be Your Man",
+            "artist": "The Rolling Stones",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 03 I Wanna Be Your Man.mp3",
+        "artist": "The Rolling Stones",
+        "singer": null,
+        "title": "I Wanna Be Your Man"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 7/01 - Comme Il Faut.mp3",
+            "title": "Comme Il Faut",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 204.8,
+            "Energy": -16.698284149169922,
+            "Key": "Am",
+            "camelotKey": "8A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 8/08 - Rodrigues Peña.mp3",
+            "title": "Rodrigues Peña",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 187.5,
+            "Energy": -15.872577667236328,
+            "Key": "A",
+            "camelotKey": "11B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 9/05 - Viviani.mp3",
+            "title": "Viviani",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 161.8,
+            "Energy": -15.66891860961914,
+            "Key": "C#m",
+            "camelotKey": "12A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 9/06 - Germain.mp3",
+            "title": "Germain",
+            "artist": "Carlos Di Sarli Y Su",
+            "seconds": 0,
+            "BPM": 193.2,
+            "Energy": -16.42221450805664,
+            "Key": "Gm",
+            "camelotKey": "6A"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 1/03 - Family Tradition.mp3",
+            "title": "Family Tradition",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 1/03 - Family Tradition.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Family Tradition"
+      },
+      {
+        "type": "tanda",
+        "style": "Milonga",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/(Disc 2) 07 - Apología Tanguera (Milonga).mp3",
+            "title": "Apología Tanguera (Milonga)",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 131,
+            "Energy": -16.82096290588379,
+            "Key": "Cm",
+            "camelotKey": "5A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/(Disc 2) 17 - Del Buenos Aires De Ayer (Milonga).mp3",
+            "title": "Del Buenos Aires De Ayer (Milonga)",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 149.7,
+            "Energy": -16.615428924560547,
+            "Key": "Am",
+            "camelotKey": "8A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/10 - Milonga Que Viene Al Tranco.mp3",
+            "title": "Milonga Que Viene Al Tranco",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 119.4,
+            "Energy": -16.828622817993164,
+            "Key": "Em",
+            "camelotKey": "9A"
+          }
+        ]
+      }
+    ],
+    "totalMinutes": 71
+  },
+  "meta": {
+    "version": 1
+  }
+}

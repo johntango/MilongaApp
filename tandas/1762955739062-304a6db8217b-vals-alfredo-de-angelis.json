@@ -1,0 +1,66 @@
+{
+  "id": "304a6db8217b",
+  "name": "Vals-Alfredo de Angelis",
+  "createdAt": "2025-11-12T13:55:39.062Z",
+  "tanda": {
+    "type": "tanda",
+    "orchestra": "Alfredo de Angelis",
+    "style": "Vals",
+    "tracks": [
+      {
+        "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL2RlIEFuZ2VsaXMvR3JhbmRlcyBEZWwgVGFuZ28gMTEvKERpc2MgMikgMDggLSBGbG9yZXMgRGVsIEFsbWEubXAz",
+        "title": "Flores Del Alma",
+        "artist": "Alfredo de Angelis",
+        "album": "Grandes Del Tango 11",
+        "BPM": 153.6,
+        "Energy": -16.06197166442871,
+        "Key": "Gm",
+        "camelotKey": "6A",
+        "absPath": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/(Disc 2) 08 - Flores Del Alma.mp3",
+        "seconds": null
+      },
+      {
+        "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL2RlIEFuZ2VsaXMvR3JhbmRlcyBEZWwgVGFuZ28gMjAgLSBBbGZyZWRvIERlIEFuZ2VsaXMgMi8oRGlzYyAyKSAwNSAtIE1pIE5vdmlhIERlIEF5ZXIubXAz",
+        "title": "Mi Novia De Ayer",
+        "artist": "Alfredo de Angelis",
+        "album": "Grandes Del Tango 20 - Alfredo De Angelis 2",
+        "BPM": 142.5,
+        "Energy": -16.54019546508789,
+        "Key": "Bb",
+        "camelotKey": "6B",
+        "absPath": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 20 - Alfredo De Angelis 2/(Disc 2) 05 - Mi Novia De Ayer.mp3",
+        "seconds": null
+      },
+      {
+        "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL2RlIEFuZ2VsaXMvR3JhbmRlcyBEZWwgVGFuZ28gMjAgLSBBbGZyZWRvIERlIEFuZ2VsaXMgMi8oRGlzYyAyKSAwOSAtIE1pIENhcmluzINpdG8ubXAz",
+        "title": "Mi Cariñito",
+        "artist": "Alfredo de Angelis",
+        "album": "Grandes Del Tango 20 - Alfredo De Angelis 2",
+        "BPM": 152.4,
+        "Energy": -16.507600784301758,
+        "Key": "A",
+        "camelotKey": "11B",
+        "absPath": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 20 - Alfredo De Angelis 2/(Disc 2) 09 - Mi Cariñito.mp3",
+        "seconds": null
+      }
+    ],
+    "metadata": {
+      "trackCount": 3,
+      "totalSeconds": 0,
+      "approxMinutes": 0,
+      "avgBPM": 150,
+      "keys": [
+        "6A",
+        "6B",
+        "11B"
+      ],
+      "artists": [
+        "Alfredo de Angelis"
+      ],
+      "savedFrom": "manual"
+    }
+  },
+  "meta": {
+    "version": 1
+  }
+}

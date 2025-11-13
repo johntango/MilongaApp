@@ -1,0 +1,391 @@
+{
+  "id": "945ce9fd7527",
+  "name": "undermyskin",
+  "createdAt": "2025-10-30T18:35:09.145Z",
+  "plan": {
+    "tandas": [
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 01 - Tierra Negra.mp3",
+            "title": "Tierra Negra",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 125.3,
+            "Energy": -16.05849266052246,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 05 - Al Compás Del Corazón.mp3",
+            "title": "Al Compas del Corazon",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 135.1,
+            "Energy": -16.730066299438477,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 06 - Cosas Olvidadas.mp3",
+            "title": "Cosas Olvidadas",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 130,
+            "Energy": -16.7016544342041,
+            "Key": "Ab",
+            "camelotKey": "4B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 08 - Verdemar.mp3",
+            "title": "Verdemar",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 111.7,
+            "Energy": -16.31116485595703,
+            "Key": "Em",
+            "camelotKey": "9A"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Chantal Chamberland/Dripping Indigo/14 - I've Got You Under My Skin.mp3",
+            "title": "I've Got You Under My Skin",
+            "artist": "Chantal Chamberland",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 08 - Don't Give Us A Reason.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Don't Give Us A Reason"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/01 - Corrientes Y Esmeralda.mp3",
+            "title": "Corrientes Y Esmeralda",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 115.9,
+            "Energy": -16.749046325683594,
+            "Key": "Em",
+            "camelotKey": "9A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Angel Vargas/Grandes Del Tango 30 - Angel Vargas 2/14 - Noche De Locura.mp3",
+            "title": "Noche De Locura",
+            "artist": "Ángel Vargas",
+            "seconds": 0,
+            "BPM": 186.8,
+            "Energy": -16.41759490966797,
+            "Key": "Em",
+            "camelotKey": "9A"
+          },
+          {
+            "id": null,
+            "title": "replace this",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null
+          },
+          {
+            "id": null,
+            "title": "replace this",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Fleetwood Mac/Rumours/Rumours 04 Don't Stop.mp3",
+            "title": "Don't Stop",
+            "artist": "Fleetwood Mac",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Fleetwood Mac/Rumours/Rumours 04 Don't Stop.mp3",
+        "artist": "Fleetwood Mac",
+        "singer": null,
+        "title": "Don't Stop"
+      },
+      {
+        "type": "tanda",
+        "style": "Vals",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 05 Que Lejos Que Estoy.mp3",
+            "title": "Que Lejos Que Estoy",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 123.7,
+            "Energy": -17.179079055786133,
+            "Key": "A",
+            "camelotKey": "11B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 09 Pues Quien lo Tiene-.mp3",
+            "title": "Pues Quien lo Tiene?",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 161.3,
+            "Energy": -17.21436309814453,
+            "Key": "D",
+            "camelotKey": "10B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Rodriguez/Sus Primeros Sucesos [Canta R Flores]/Sus Primeros Sucesos [Canta R Flores] 08 Maja Aristocratica.mp3",
+            "title": "Maja Aristocratica",
+            "artist": "Enrique Rodriguez",
+            "seconds": 0,
+            "BPM": 165.2,
+            "Energy": -16.994827270507812,
+            "Key": "F#",
+            "camelotKey": "2B"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 08 - Don't Give Us A Reason.mp3",
+            "title": "Don't Give Us A Reason",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 3/(Disc 3) 08 - Don't Give Us A Reason.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Don't Give Us A Reason"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/ElChoclo Vareious Artists/Alberto Castillo - el choclo.mp3",
+            "title": "El Choclo",
+            "artist": "Angel D'Agostino Y Su",
+            "seconds": 0,
+            "BPM": 137.8,
+            "Energy": -16.475854873657227,
+            "Key": "Dm",
+            "camelotKey": "7A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 7/05 - Pero Yo Se.mp3",
+            "title": "Pero Yo Se",
+            "artist": "Angel D'Agostino Y Su",
+            "seconds": 0,
+            "BPM": 145.3,
+            "Energy": -16.81201171875,
+            "Key": "D",
+            "camelotKey": "10B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 7/06 - Adios Arrabal.mp3",
+            "title": "Adios Arrabal",
+            "artist": "Angel D'Agostino Y Su",
+            "seconds": 0,
+            "BPM": 163.2,
+            "Energy": -16.62494468688965,
+            "Key": "D",
+            "camelotKey": "10B"
+          },
+          {
+            "id": null,
+            "title": "replace this",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 2/Singles Collection- The London Years Disc 2 02 19th Nervous Breakdown.mp3",
+            "title": "19th Nervous Breakdown",
+            "artist": "The Rolling Stones",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 2/Singles Collection- The London Years Disc 2 02 19th Nervous Breakdown.mp3",
+        "artist": "The Rolling Stones",
+        "singer": null,
+        "title": "19th Nervous Breakdown"
+      },
+      {
+        "type": "tanda",
+        "style": "Tango",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 8/13 - El Amanecer.mp3",
+            "title": "El Amanecer",
+            "artist": "Domingo Federico Y Su",
+            "seconds": 0,
+            "BPM": 137.3,
+            "Energy": -17.040531158447266,
+            "Key": "Cm",
+            "camelotKey": "5A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 9/11 - Charlemos.mp3",
+            "title": "Charlemos",
+            "artist": "Domingo Federico Y Su",
+            "seconds": 0,
+            "BPM": 131,
+            "Energy": -16.560060501098633,
+            "Key": "Cm",
+            "camelotKey": "5A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 8/15 - Honda Tristeza.mp3",
+            "title": "Honda Tristeza",
+            "artist": "Domingo Federico Y Su",
+            "seconds": 0,
+            "BPM": 210.1,
+            "Energy": -16.606050491333008,
+            "Key": "Dm",
+            "camelotKey": "7A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Edmundo Rivero/Cafetin De Buenos Arires, Vol. 9/12 - Y Todavia Te Quiero.mp3",
+            "title": "Y Todavia Te Quiero",
+            "artist": "Domingo Federico Y Su",
+            "seconds": 0,
+            "BPM": 125.1,
+            "Energy": -16.524402618408203,
+            "Key": "Am",
+            "camelotKey": "8A"
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Willie Nelson/Super Hits/Super Hits 02 My Heroes Have Always Been Cowboys.mp3",
+            "title": "My Heroes Have Always Been Cowboys",
+            "artist": "Willie Nelson",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Willie Nelson/Super Hits/Super Hits 02 My Heroes Have Always Been Cowboys.mp3",
+        "artist": "Willie Nelson",
+        "singer": null,
+        "title": "My Heroes Have Always Been Cowboys"
+      },
+      {
+        "type": "tanda",
+        "style": "Milonga",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 11/(Disc 2) 03 - Cien Guitarras.mp3",
+            "title": "Cien Guitarras",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 128.7,
+            "Energy": -16.044992446899414,
+            "Key": "Em",
+            "camelotKey": "9A"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 20 - Alfredo De Angelis 2/(Disc 2) 16 - Patrona.mp3",
+            "title": "Patrona",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 138.8,
+            "Energy": -16.990510940551758,
+            "Key": "G",
+            "camelotKey": "9B"
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/de Angelis/Grandes Del Tango 20 - Alfredo De Angelis 2/14 - El Otario.mp3",
+            "title": "El Otario",
+            "artist": "Alfredo de Angelis",
+            "seconds": 0,
+            "BPM": 139.9,
+            "Energy": -17.10007667541504,
+            "Key": "G",
+            "camelotKey": "9B"
+          }
+        ]
+      }
+    ],
+    "totalMinutes": 71
+  },
+  "meta": {
+    "version": 1
+  }
+}
