@@ -631,7 +631,9 @@ async function planOneTandaWithRetry({
   }
 
   // If first attempt produced insufficient tracks, try alternatives
-  if (!lastResult || lastResult.trackIds.length < Math.max(1, size - 2)) {
+  const countReal = (r) => Array.isArray(r?.trackIds) ? r.trackIds.filter(id => id !== 'replace').length : 0;
+
+  if (!lastResult || countReal(lastResult) < Math.max(1, size - 2)) {
     const alternativeOrchestras = getAlternativeOrchestras(profiles, [orchestra]);
     
     if (onLLMOutput) {
@@ -654,15 +656,15 @@ async function planOneTandaWithRetry({
         }
 
         // If this attempt is better, use it
-        if (retryResult.trackIds.length > (lastResult?.trackIds.length || 0)) {
+        if (countReal(retryResult) > countReal(lastResult)) {
           lastResult = retryResult;
           if (onLLMOutput) {
             onLLMOutput(`✓ Better result found with ${altOrchestra}\n`);
           }
         }
 
-        // If we have enough tracks, stop retrying
-        if (retryResult.trackIds.length >= size - 1) {
+        // If we have enough REAL tracks, stop retrying
+        if (countReal(retryResult) >= size - 1) {
           break;
         }
       } catch (error) {
@@ -674,7 +676,7 @@ async function planOneTandaWithRetry({
   }
 
   // Final fallback: try with no orchestra restriction
-  if (!lastResult || lastResult.trackIds.length === 0) {
+  if (!lastResult || countReal(lastResult) === 0) {
     if (onLLMOutput) {
       onLLMOutput(`Final fallback: trying with no orchestra restriction...\n`);
     }
@@ -685,7 +687,7 @@ async function planOneTandaWithRetry({
         orchestra: null, prevKey, onLLMOutput
       });
       
-      if (fallbackResult.trackIds.length > (lastResult?.trackIds.length || 0)) {
+      if (countReal(fallbackResult) > countReal(lastResult)) {
         lastResult = fallbackResult;
         if (onLLMOutput) {
           onLLMOutput(`✓ Fallback produced ${fallbackResult.trackIds.length} tracks\n`);
@@ -894,9 +896,23 @@ async function planOneTanda({
     onLLMOutput(`Actual orchestras of selected tracks: ${JSON.stringify(selectedOrchestras)}\n\n`);
   }
 
+  // Ensure we return the requested number of track IDs by padding with a
+  // placeholder ID ("replace") when the agent couldn't provide enough.
+  // Higher-level code will turn these placeholder IDs into placeholder
+  // track objects so the tanda still has the correct length.
+  const returnedTracks = Array.isArray(out.tracks) ? out.tracks.slice() : [];
+  if (returnedTracks.length < wantSize) {
+    const need = wantSize - returnedTracks.length;
+    for (let i = 0; i < need; i++) returnedTracks.push("replace");
+    out.warnings = out.warnings || [];
+    out.warnings.push(`Padded ${need} placeholder track(s)`);
+    if (onLLMOutput) onLLMOutput(`⚠️ Padded ${need} placeholder track(s) to reach ${wantSize} tracks\n`);
+    console.log(`[PLAN ONE TANDA] ⚠️ Padded ${need} placeholder track(s) to reach ${wantSize} tracks`);
+  }
+
   return {
     style: out.style,
-    trackIds: out.tracks,
+    trackIds: returnedTracks,
     notes: out.notes ?? null,
     warnings: out.warnings ?? null,
   };
@@ -2456,7 +2472,8 @@ export function registerAgentRoutes(app) {
             onLLMOutput: streamLLMOutput // Pass LLM output streaming to tanda generation
           });
 
-          if (result && result.trackIds && result.trackIds.length > 0) {
+          const realCount = Array.isArray(result?.trackIds) ? result.trackIds.filter(id => id !== 'replace').length : 0;
+          if (result && result.trackIds && realCount > 0) {
             usedAlternative = targetOrchestra;
             streamLLMOutput(`[RETRY TANDA] ✅ Success with orchestra ${targetOrchestra}`);
             console.log(`[RETRY TANDA] ✅ Success with orchestra ${targetOrchestra}`);
@@ -2469,9 +2486,10 @@ export function registerAgentRoutes(app) {
         }
       }
 
-      if (result && result.trackIds && result.trackIds.length > 0) {
-        streamLLMOutput(`[RETRY TANDA] ✅ Successfully generated new tanda with ${result.trackIds.length} tracks using ${usedAlternative}`);
-        console.log(`[RETRY TANDA] ✅ Successfully generated new tanda with ${result.trackIds.length} tracks using ${usedAlternative}`);
+      const realCountFinal = Array.isArray(result?.trackIds) ? result.trackIds.filter(id => id !== 'replace').length : 0;
+      if (result && result.trackIds && realCountFinal > 0) {
+        streamLLMOutput(`[RETRY TANDA] ✅ Successfully generated new tanda with ${result.trackIds.length} tracks (including ${result.trackIds.length - realCountFinal} placeholders) using ${usedAlternative}`);
+        console.log(`[RETRY TANDA] ✅ Successfully generated new tanda with ${result.trackIds.length} tracks (including ${result.trackIds.length - realCountFinal} placeholders) using ${usedAlternative}`);
         
         // Convert trackIds back to track objects
         console.log(`[RETRY TANDA] Converting ${result.trackIds.length} trackIds:`, result.trackIds);
@@ -3053,7 +3071,7 @@ export function registerAgentStreamRoutes(app){
         if (remainingSeconds <= 60) break;
 
         const { style, role, size } = slots[i];
-        const sizeTarget = Number.isFinite(size) ? size : (sizes[style] ?? 3);
+        const sizeTarget = Number.isFinite(size) ? size : (sizes[style] ?? (style === "Tango" ? 4 : 3));
         let tandaMade = false;
 
         // ---------- 1) Role filter base set ----------
