@@ -293,6 +293,7 @@
           return pattern.map((s) => ({
             style: s.style,
             role: s.role || defaultRole,
+            size: s.size !== undefined ? s.size : s.style === "Tango" ? 4 : 3, // Prioritize explicit size
           }));
         }
         // Case B: legacy pattern + optional schedule[]
@@ -304,6 +305,7 @@
           return pattern.map((style, i) => ({
             style,
             role: roles[i] || defaultRole,
+            size: style === "Tango" ? 4 : 3, // Add explicit size to slots
           }));
         }
         throw new Error(

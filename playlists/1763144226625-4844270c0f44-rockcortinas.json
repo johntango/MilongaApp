@@ -1,0 +1,448 @@
+{
+  "id": "4844270c0f44",
+  "name": "RockCortinas",
+  "createdAt": "2025-11-14T18:17:06.625Z",
+  "plan": {
+    "tandas": [
+      {
+        "type": "tanda",
+        "style": "tango",
+        "role": "classic",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Grandes Del Tango 12+1/(Disc 2) 15 - Sombras Del Puerto.mp3",
+            "title": "Sombras del Puerto",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 130.2,
+            "Energy": -16.07818603515625,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "artUrl": "/album-art/sus-primeros-exitos-vol-3-carlos-di-sarli.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Sus Primeros Exitos, Vol. 2/05 - Va a Cantar un Ruiseñor.mp3",
+            "title": "Va a Cantar un Ruiseñor",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 124.9,
+            "Energy": -16.55154800415039,
+            "Key": "D",
+            "camelotKey": "10B",
+            "artUrl": "/album-art/sus-primeros-exitos-vol-3-carlos-di-sarli.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Sus Primeros Exitos, Vol. 2/13 - Vamos!.mp3",
+            "title": "Vamos! ...",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 129.5,
+            "Energy": -16.690061569213867,
+            "Key": "F",
+            "camelotKey": "7B",
+            "artUrl": "/album-art/sus-primeros-exitos-vol-3-carlos-di-sarli.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Carlos Di Sarli/Sus Primeros Exitos, Vol. 2/18 - La Cancion Mas Triste.mp3",
+            "title": "La Cancion Mas Triste",
+            "artist": "Carlos Di Sarli",
+            "seconds": 0,
+            "BPM": 118.8,
+            "Energy": -16.64440155029297,
+            "Key": "D",
+            "camelotKey": "10B",
+            "artUrl": "/album-art/sus-primeros-exitos-vol-3-carlos-di-sarli.jpg",
+            "year": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 15 Heart of Stone.mp3",
+            "title": "Heart of Stone",
+            "artist": "The Rolling Stones",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 15 Heart of Stone.mp3",
+        "artist": "The Rolling Stones",
+        "singer": null,
+        "title": "Heart of Stone"
+      },
+      {
+        "type": "tanda",
+        "style": "tango",
+        "role": "classic",
+        "size": 4,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/10 El Andariego.mp3",
+            "title": "El Andariego",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 117.1,
+            "Energy": -16.93684196472168,
+            "Key": "D",
+            "camelotKey": "10B",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/05 Ilusion De Mi Vida.mp3",
+            "title": "Ilusion De Mi Vida",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 145,
+            "Energy": -17.506805419921875,
+            "Key": "A",
+            "camelotKey": "11B",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/09 Nagracha.mp3",
+            "title": "Nagracha",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 140.4,
+            "Energy": -17.459877014160156,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "artUrl": "/album-art/con-estilo-para-bailar-volumen-1-color-tango.jpg",
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/07 Nonino.mp3",
+            "title": "Nonino",
+            "artist": "Color Tango",
+            "album": "Con estilo para bailar, volumen 1",
+            "BPM": 128.2,
+            "Energy": -17.09197235107422,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "seconds": 0
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Willie Nelson/Super Hits/Super Hits 03 Blue Eyes Crying in the Rain.mp3",
+            "title": "Blue Eyes Crying in the Rain",
+            "artist": "Willie Nelson",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Willie Nelson/Super Hits/Super Hits 03 Blue Eyes Crying in the Rain.mp3",
+        "artist": "Willie Nelson",
+        "singer": null,
+        "title": "Blue Eyes Crying in the Rain"
+      },
+      {
+        "type": "tanda",
+        "orchestra": "Color Tango",
+        "style": "Tango",
+        "tracks": [
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsdmFyZXovQ2llZ28tQ29sb3JUYW5nby8wMSBHYWxsbyBjaWVnby5tcDM",
+            "title": "Gallo ciego",
+            "artist": "Color Tango",
+            "album": "Con estilo para bailar, volumen 1",
+            "BPM": 152.6,
+            "Energy": -17.1108455657959,
+            "Key": "Dm",
+            "camelotKey": "7A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/01 Gallo ciego.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsdmFyZXovQ2llZ28tQ29sb3JUYW5nby8xNCBNb3JlbmEubXAz",
+            "title": "Morena",
+            "artist": "Color Tango",
+            "album": "Con estilo para bailar, volumen 1",
+            "BPM": 143.7,
+            "Energy": -17.053613662719727,
+            "Key": "Dm",
+            "camelotKey": "7A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/14 Morena.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsdmFyZXovQ2llZ28tQ29sb3JUYW5nby8xNSBOb3N0YcyBbGdpY28ubXAz",
+            "title": "Nostálgico",
+            "artist": "Color Tango",
+            "album": "Con estilo para bailar, volumen 1",
+            "BPM": 129.3,
+            "Energy": -16.6689395904541,
+            "Key": "Dm",
+            "camelotKey": "7A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/15 Nostálgico.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsdmFyZXovQ2llZ28tQ29sb3JUYW5nby8xMSBadW0ubXAz",
+            "title": "Zum",
+            "artist": "Color Tango",
+            "album": "Con estilo para bailar, volumen 1",
+            "BPM": 134.2,
+            "Energy": -17.109302520751953,
+            "Key": "Em",
+            "camelotKey": "9A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alvarez/Ciego-ColorTango/11 Zum.mp3",
+            "seconds": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Various Artists/The British Invasion- History of British Rock, Vol. 1/The British Invasion- History of British Rock, Vol. 1 19 Tip of My Tongue.mp3",
+            "title": "Tip of My Tongue",
+            "artist": "Tommy Quickly",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/Various Artists/The British Invasion- History of British Rock, Vol. 1/The British Invasion- History of British Rock, Vol. 1 19 Tip of My Tongue.mp3",
+        "artist": "Tommy Quickly",
+        "singer": null,
+        "title": "Tip of My Tongue"
+      },
+      {
+        "type": "tanda",
+        "style": "tango",
+        "role": "rich",
+        "size": 4,
+        "approxMinutes": 12,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Canaro/Tango Collection/01 - Poema.mp3",
+            "title": "Poema",
+            "artist": "Francisco Canaro",
+            "seconds": 0,
+            "BPM": 127.1,
+            "Energy": -17.536123275756836,
+            "Key": "C",
+            "camelotKey": "8B",
+            "artUrl": "/album-art/tango-collection-francisco-canaro.jpg",
+            "year": 2010
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Canaro/Tango Collection/07 - Soledad.mp3",
+            "title": "Soledad",
+            "artist": "Francisco Canaro",
+            "seconds": 0,
+            "BPM": 132.1,
+            "Energy": -17.291213989257812,
+            "Key": "Eb",
+            "camelotKey": "5B",
+            "artUrl": "/album-art/tango-collection-francisco-canaro.jpg",
+            "year": 2010
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/GreatestTangoCollectionEver Disc1/14 - Bandoneon Arrabalero.mp3",
+            "title": "Bandoneon Arrabalero",
+            "artist": "Francisco Canaro",
+            "seconds": 0,
+            "BPM": 133,
+            "Energy": -17.452987670898438,
+            "Key": "Eb",
+            "camelotKey": "5B",
+            "artUrl": "/album-art/tango-collection-canaro.jpg",
+            "year": 2009
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Canaro/Tango Collection/09 - Casas Viejas.mp3",
+            "title": "Casas Viejas",
+            "artist": "Francisco Canaro",
+            "seconds": 0,
+            "BPM": 122.7,
+            "Energy": -17.5723876953125,
+            "Key": "Eb",
+            "camelotKey": "5B",
+            "artUrl": "/album-art/tango-collection-francisco-canaro.jpg",
+            "year": 2010
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 2/(Disc 2) 13 - Born To Boogie.mp3",
+            "title": "Born To Boogie",
+            "artist": "Hank Williams Jr.",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/Hank Williams Jr_/The Complete Disc 2/(Disc 2) 13 - Born To Boogie.mp3",
+        "artist": "Hank Williams Jr.",
+        "singer": null,
+        "title": "Born To Boogie"
+      },
+      {
+        "type": "tanda",
+        "orchestra": "Alfredo de Angelis O.T. con Oscar Larroca",
+        "style": "Tango",
+        "tracks": [
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsZnJlZG8gZGUgQW5nZWxpcy9Db21vIG5vcyBjYW1iaWEgbGEgdmlkYS8wMSAtIENvbW8gbm9zIGNhbWJpYSBsYSB2aWRhLm1wMw",
+            "title": "Como nos cambia la vida",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 146.5,
+            "Energy": -17.010061264038086,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/01 - Como nos cambia la vida.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsZnJlZG8gZGUgQW5nZWxpcy9Db21vIG5vcyBjYW1iaWEgbGEgdmlkYS8wMyAtIEJhaWxhcmluIGNvbXBhZHJpdG8ubXAz",
+            "title": "Bailarin compadrito",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 144.8,
+            "Energy": -17.25041389465332,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/03 - Bailarin compadrito.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsZnJlZG8gZGUgQW5nZWxpcy9Db21vIG5vcyBjYW1iaWEgbGEgdmlkYS8wOSAtIEVuIHR1cyBicmF6b3MubXAz",
+            "title": "En tus brazos",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 125,
+            "Energy": -16.720340728759766,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/09 - En tus brazos.mp3",
+            "seconds": null
+          },
+          {
+            "id": "L1VzZXJzL2pvaG53aWxsaWFtcy9NdXNpYy9NeU11c2ljL0FsZnJlZG8gZGUgQW5nZWxpcy9Db21vIG5vcyBjYW1iaWEgbGEgdmlkYS8wNiAtIFBvciBxdWUgbWUgZGFzIGRpcXVlXy5tcDM",
+            "title": "Por que me das dique?",
+            "artist": "Alfredo de Angelis O.T. con Oscar Larroca",
+            "album": "Como nos cambia la vida",
+            "BPM": 146.9,
+            "Energy": -16.773174285888672,
+            "Key": "Cm",
+            "camelotKey": "5A",
+            "absPath": "/Users/johnwilliams/Music/MyMusic/Alfredo de Angelis/Como nos cambia la vida/06 - Por que me das dique_.mp3",
+            "seconds": null
+          }
+        ]
+      },
+      {
+        "type": "cortina",
+        "style": "Cortina",
+        "size": 1,
+        "approxMinutes": 1,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 05 Not Fade Away.mp3",
+            "title": "Not Fade Away",
+            "artist": "The Rolling Stones",
+            "BPM": null,
+            "Energy": null,
+            "Key": null,
+            "camelotKey": null,
+            "seconds": 60
+          }
+        ],
+        "streamId": "/Users/johnwilliams/Music/MyMusic/ROCK Artists/The Rolling Stones/Singles Collection- The London Years Disc 1/Singles Collection- The London Years Disc 1 05 Not Fade Away.mp3",
+        "artist": "The Rolling Stones",
+        "singer": null,
+        "title": "Not Fade Away"
+      },
+      {
+        "type": "tanda",
+        "style": "milonga",
+        "role": "classic",
+        "size": 3,
+        "approxMinutes": 9,
+        "tracks": [
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Milongas Vals/Track 11Milonga.mp3",
+            "title": "Track 11Milonga",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 171.6,
+            "Energy": -17.67940330505371,
+            "Key": "Cm",
+            "camelotKey": "5A",
+            "artUrl": null,
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Milongas Vals/Track 15Milonga.mp3",
+            "title": "Track 15Milonga",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 183.9,
+            "Energy": -17.776554107666016,
+            "Key": "Gm",
+            "camelotKey": "6A",
+            "artUrl": null,
+            "year": null
+          },
+          {
+            "id": "/Users/johnwilliams/Music/MyMusic/Artisti vari/Milongas Vals/Track 3Milonga.mp3",
+            "title": "Track 3Milonga",
+            "artist": "Unknown",
+            "seconds": 0,
+            "BPM": 173,
+            "Energy": -17.762821197509766,
+            "Key": "Am",
+            "camelotKey": "8A",
+            "artUrl": null,
+            "year": null
+          }
+        ]
+      }
+    ],
+    "totalMinutes": 71
+  },
+  "meta": {
+    "version": 1
+  }
+}

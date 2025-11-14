@@ -67,7 +67,8 @@ const nextTandaAgent = new Agent({
     "Hard rules:",
     "- Use ONLY track IDs from the provided CANDIDATES list.",
     "- Do NOT repeat any ID from the provided USED_IDS list.",
-    "- Match the requested style and size.",
+    "- Match the EXACT requested size - if asked for 4 tracks, return exactly 4 tracks.",
+    "- Tango tandas typically have 4 tracks, Vals have 3 tracks, Milonga have 3 tracks.",
     "- Prefer stylistic coherence (era/energy/artist); avoid back-to-back same artist unless needed.",
     "- Keep within the remaining time when possible; prefer typical lengths.",
     "Return ONLY JSON that matches the output schema.",
@@ -723,7 +724,8 @@ async function planOneTanda({
   const usedSet = usedIds instanceof Set ? usedIds : new Set(usedIds || []);
 
   const lines = [
-    `Plan ONE tanda of style=${wantStyle} with ${wantSize} tracks.`,
+    `Plan ONE tanda of style=${wantStyle} with EXACTLY ${wantSize} tracks.`,
+    `CRITICAL: Return exactly ${wantSize} track IDs in the tracks array - no more, no less.`,
     `Use ONLY IDs from CANDIDATES.`,
     `Restrict to ORCHESTRA="${orchText}" if specified.`,
     `Do NOT use any ID from USED_IDS.`,
@@ -3071,7 +3073,7 @@ export function registerAgentStreamRoutes(app){
         if (remainingSeconds <= 60) break;
 
         const { style, role, size } = slots[i];
-        const sizeTarget = Number.isFinite(size) ? size : (sizes[style] ?? (style === "Tango" ? 4 : 3));
+        const sizeTarget = size; // slots already have correct size from normalization
         let tandaMade = false;
 
         // ---------- 1) Role filter base set ----------

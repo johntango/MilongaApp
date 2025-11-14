@@ -1,12 +1,12 @@
 {"slots": [
-    { "style": "tango", "role": "classic" },
-    { "style": "tango", "role": "classic" },
-    { "style": "vals", "role": "classic" },
-    { "style": "tango", "role": "classic" },
-    { "style": "tango", "role": "classic" },
-    { "style": "milonga", "role": "classic" },
-    { "style": "tango", "role": "classic" },
-    { "style": "tango", "role": "classic" },
-    { "style": "vals", "role": "classic" }
+    { "style": "tango", "role": "classic", "size": 4 },
+    { "style": "tango", "role": "classic", "size": 4 },
+    { "style": "vals", "role": "classic", "size": 3 },
+    { "style": "tango", "role": "classic", "size": 4 },
+    { "style": "tango", "role": "classic", "size": 4 },
+    { "style": "milonga", "role": "classic", "size": 3 },
+    { "style": "tango", "role": "classic", "size": 4 },
+    { "style": "tango", "role": "classic", "size": 4 },
+    { "style": "vals", "role": "classic", "size": 3 }
 ]
 }
