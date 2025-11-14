@@ -34,6 +34,32 @@ const NextTanda = z.object({
   warnings: z.array(z.string()).nullable(),
 });
 
+const PlaylistReview = z.object({
+  orchestraAnalysis: z.string(),
+  musicalFlow: z.string(),
+  styleBalance: z.string(),
+  danceability: z.string(),
+  djCraft: z.string(),
+  audienceEngagement: z.string(),
+  overallAssessment: z.string(),
+  recommendations: z.array(z.string()).nullable(),
+});
+
+const playlistReviewAgent = new Agent({
+  name: "PlaylistReviewer",
+  instructions: [
+    "You are an expert Argentine tango DJ and musicologist with decades of experience in milonga programming.",
+    "Analyze playlists from the perspective of a seasoned milonguero and professional DJ.",
+    "Provide detailed, insightful reviews that help DJs improve their craft.",
+    "Be specific about track and orchestra choices where relevant.",
+    "Write in a conversational, expert tone as if advising a fellow DJ.",
+    "Focus on practical aspects: danceability, energy flow, orchestra variety, and audience engagement.",
+    "Consider both traditional milonga expectations and modern DJ techniques.",
+  ].join(" "),
+  outputType: PlaylistReview,
+  model: "gpt-4o",
+});
+
 const nextTandaAgent = new Agent({
   name: "NextTandaPlanner",
   instructions: [
@@ -531,14 +557,44 @@ function isValidTanda(tracks, minRealTracks = 2) {
   return realTracks.length >= minRealTracks;
 }
 
-/** Get alternative orchestras for retry attempts */
+/** Get alternative orchestras for retry attempts with better diversity */
 function getAlternativeOrchestras(profiles, excludeOrchestras = []) {
   const exclude = new Set(excludeOrchestras.filter(Boolean));
-  return profiles
-    .filter(p => !exclude.has(p.orchestra))
-    .sort((a, b) => (b.sampleIds?.length || 0) - (a.sampleIds?.length || 0)) // Prefer orchestras with more tracks
-    .slice(0, 5) // Top 5 alternatives
-    .map(p => p.orchestra);
+  const available = profiles.filter(p => !exclude.has(p.orchestra));
+  
+  // Calculate diversity score: balance between having enough tracks and not being overrepresented
+  const withDiversityScores = available.map(p => {
+    const trackCount = p.sampleIds?.length || 0;
+    // Penalize orchestras with too many tracks to promote variety
+    // Sweet spot: orchestras with 5-15 tracks get higher scores
+    let diversityScore;
+    if (trackCount < 3) {
+      diversityScore = trackCount * 10; // Low penalty for few tracks
+    } else if (trackCount <= 15) {
+      diversityScore = 100 + (15 - trackCount) * 2; // Peak score for medium-sized orchestras
+    } else {
+      diversityScore = Math.max(20, 100 - (trackCount - 15) * 3); // Decreasing score for large orchestras
+    }
+    
+    return {
+      orchestra: p.orchestra,
+      trackCount,
+      diversityScore,
+      profile: p
+    };
+  });
+  
+  // Sort by diversity score (higher is better), then by track count as tiebreaker
+  return withDiversityScores
+    .sort((a, b) => {
+      if (Math.abs(a.diversityScore - b.diversityScore) < 5) {
+        // If scores are close, prefer orchestras with adequate tracks (3+)
+        return Math.max(3, b.trackCount) - Math.max(3, a.trackCount);
+      }
+      return b.diversityScore - a.diversityScore;
+    })
+    .slice(0, 8) // Increased from 5 to 8 alternatives for more variety
+    .map(item => item.orchestra);
 }
 
 /** Ask the LLM to build one tanda from restricted candidates with retry logic */
@@ -548,6 +604,7 @@ async function planOneTandaWithRetry({
   remainingMinutes,
   usedIds,
   candidates,
+  allStyleCandidates = null, // Broader candidate pool for broadening
   orchestra,
   prevKey,
   onLLMOutput = null,
@@ -560,7 +617,7 @@ async function planOneTandaWithRetry({
   // First attempt with requested orchestra
   try {
     lastResult = await planOneTanda({
-      style, size, remainingMinutes, usedIds, candidates, orchestra, prevKey, onLLMOutput
+      style, size, remainingMinutes, usedIds, candidates, allStyleCandidates, orchestra, prevKey, onLLMOutput
     });
     attempts.push({ orchestra, result: lastResult });
     
@@ -586,7 +643,7 @@ async function planOneTandaWithRetry({
       
       try {
         const retryResult = await planOneTanda({
-          style, size, remainingMinutes, usedIds, candidates, 
+          style, size, remainingMinutes, usedIds, candidates, allStyleCandidates,
           orchestra: altOrchestra, prevKey, onLLMOutput
         });
         
@@ -624,7 +681,7 @@ async function planOneTandaWithRetry({
     
     try {
       const fallbackResult = await planOneTanda({
-        style, size, remainingMinutes, usedIds, candidates, 
+        style, size, remainingMinutes, usedIds, candidates, allStyleCandidates,
         orchestra: null, prevKey, onLLMOutput
       });
       
@@ -651,6 +708,7 @@ async function planOneTanda({
   remainingMinutes,
   usedIds,
   candidates,
+  allStyleCandidates = null, // Broader candidate pool for broadening
   orchestra,
   prevKey,
   onLLMOutput = null, // Optional callback for streaming LLM output
@@ -676,7 +734,118 @@ async function planOneTanda({
 
   const prompt = lines.join("\n");
   const CAND_MAX = 80;
-  const candSlim = Array.isArray(candidates) ? candidates.slice(0, CAND_MAX) : [];
+  
+  // Filter candidates by orchestra if specified (create a copy to avoid mutating original)
+  let filteredCandidates = Array.isArray(candidates) ? [...candidates] : [];
+  
+  console.log(`[PLAN ONE TANDA] Orchestra filtering: target="${orchestra}", total candidates=${filteredCandidates.length}`);
+  if (onLLMOutput) {
+    onLLMOutput(`🔍 Orchestra filtering: target="${orchestra}", total candidates=${filteredCandidates.length}\n`);
+  }
+  
+  console.log(`[PLAN ONE TANDA] Orchestra check: orchestra="${orchestra}", condition=${orchestra && orchestra !== "any orchestra"}`);
+  
+  if (orchestra && orchestra !== "any orchestra") {
+    console.log(`[PLAN ONE TANDA] ✅ Entering orchestra filtering for "${orchestra}"`);
+    const normalizeOrchestra = (orch) => {
+      if (!orch) return "";
+      let normalized = String(orch).trim();
+      
+      // More gentle normalization - only remove common suffixes, preserve main name
+      normalized = normalized
+        .replace(/\s+O\.T\.\s+con\s+.*$/i, '') // Remove "O.T. con ..." part
+        .replace(/\s+y\s+su\s+orquesta\s*.*$/i, '') // Remove "y su orquesta" part
+        .replace(/\s+Y\s+Su\s*.*$/i, '') // Remove "Y Su" part
+        .trim();
+      
+      // Ensure we don't return empty string unless input was empty
+      return normalized || String(orch).trim();
+    };
+    
+    const targetNorm = normalizeOrchestra(orchestra);
+    
+    console.log(`[PLAN ONE TANDA] Looking for normalized orchestra: "${targetNorm}"`);
+    
+    // Get unique orchestras from candidates - both original and normalized
+    const orchestraInfo = [...new Set(filteredCandidates.map(t => {
+      const candidateOrch = t?.tags?.artist ?? t?.artist ?? t?.orchestra ?? "";
+      return candidateOrch;
+    }).filter(Boolean))].slice(0, 10).map(orig => ({
+      original: orig,
+      normalized: normalizeOrchestra(orig)
+    }));
+    
+    console.log(`[PLAN ONE TANDA] Available orchestras in candidates:`, orchestraInfo);
+    
+    if (onLLMOutput) {
+      onLLMOutput(`🎯 Looking for normalized orchestra: "${targetNorm}"\n`);
+      onLLMOutput(`Available orchestras: ${orchestraInfo.map(o => o.original).join(', ')}\n`);
+      // Show sample candidate orchestras
+      const sampleOrchs = filteredCandidates.slice(0, 5).map(t => {
+        const candidateOrch = t.artist || t.orchestra || "";
+        const candNorm = normalizeOrchestra(candidateOrch);
+        return `"${candidateOrch}" -> "${candNorm}"`;
+      });
+      onLLMOutput(`Sample candidate orchestras: ${sampleOrchs.join(', ')}\n`);
+    }
+    
+    console.log(`[PLAN ONE TANDA] Starting filter loop for ${filteredCandidates.length} candidates`);
+    
+    let checkCount = 0;
+    let originalLength = filteredCandidates.length;
+    
+    filteredCandidates = filteredCandidates.filter(t => {
+      const candidateOrch = t?.tags?.artist ?? t?.artist ?? t?.orchestra ?? "";
+      const candNorm = normalizeOrchestra(candidateOrch);
+      const isMatch = candNorm === targetNorm;
+      
+      // Debug first few matches/mismatches
+      if (checkCount < 5) {
+        console.log(`[PLAN ONE TANDA] Checking[${checkCount}]: "${candidateOrch}" -> "${candNorm}" vs "${targetNorm}" = ${isMatch}`);
+      }
+      checkCount++;
+      
+      return isMatch;
+    });
+    
+    console.log(`[PLAN ONE TANDA] Filter completed: ${originalLength} -> ${filteredCandidates.length} candidates (checked ${checkCount} items)`);
+    
+    // For regular generation, if orchestra filtering results in too few candidates, broaden the filter
+    // This is especially important when the candidate pool has been reduced by previous tandas
+    if (filteredCandidates.length < Math.max(4, size || 4)) {
+      const broaderCandidates = allStyleCandidates || candidates;
+      console.log(`[PLAN ONE TANDA] ⚠️ Insufficient orchestra matches (${filteredCandidates.length}), broadening to use all ${broaderCandidates.length} style candidates for proper tanda generation`);
+      filteredCandidates = broaderCandidates; // Use broader candidate pool for better AI generation
+    }
+    
+    console.log(`[PLAN ONE TANDA] ✅ Filtered candidates for orchestra "${orchestra}": ${filteredCandidates.length} tracks found`);
+    
+    if (onLLMOutput) {
+      onLLMOutput(`✅ Filtered candidates for orchestra "${orchestra}": ${filteredCandidates.length} tracks found\n`);
+    }
+    
+    // If no tracks found for specific orchestra, fall back to all candidates
+    if (filteredCandidates.length === 0) {
+      if (onLLMOutput) {
+        onLLMOutput(`⚠️ No tracks found for orchestra "${orchestra}", using all candidates\n`);
+      }
+      filteredCandidates = candidates;
+    }
+    console.log(`[PLAN ONE TANDA] ✅ Orchestra filtering completed for "${orchestra}"`);
+  } else {
+    console.log(`[PLAN ONE TANDA] ⚠️ Orchestra filtering skipped for "${orchestra}"`);
+  }
+  
+  console.log(`[PLAN ONE TANDA] Final candidate count: ${filteredCandidates.length}`);
+  const candSlim = filteredCandidates.slice(0, CAND_MAX);
+
+  // Debug: log the first few candidates to see their structure
+  if (onLLMOutput) {
+    onLLMOutput(`\n--- DEBUG: Candidate structure (${candSlim.length} total) ---\n`);
+    candSlim.slice(0, 3).forEach((cand, i) => {
+      onLLMOutput(`Candidate ${i}: ID="${getId(cand)}", title="${cand.title}", artist="${cand.artist}"\n`);
+    });
+  }
 
   const items = [
     system("Follow the schema exactly. Never invent or repeat IDs. No prose."),
@@ -715,7 +884,14 @@ async function planOneTanda({
     if (out.warnings && out.warnings.length > 0) {
       onLLMOutput(`Warnings: ${out.warnings.join(', ')}\n`);
     }
-    onLLMOutput(`Track IDs: ${JSON.stringify(out.tracks, null, 2)}\n\n`);
+    onLLMOutput(`Track IDs: ${JSON.stringify(out.tracks, null, 2)}\n`);
+    
+    // Debug: check what orchestras the selected tracks actually belong to
+    const selectedOrchestras = out.tracks.map(trackId => {
+      const track = candSlim.find(t => getId(t) === trackId);
+      return track ? (track.artist || track.orchestra || 'Unknown') : 'Not Found';
+    });
+    onLLMOutput(`Actual orchestras of selected tracks: ${JSON.stringify(selectedOrchestras)}\n\n`);
   }
 
   return {
@@ -759,7 +935,7 @@ async function suggestNextOrchestras({ style, prevKey, recentOrchestras, profile
       commonCamelot: p.commonCamelot,
       avgSeconds: p.avgSeconds,
     }))
-    .slice(0, 80);
+    .slice(0, 200);
 
   const roleHint = role ? `\nRole focus: "${role}". Bias toward orchestras whose peak recordings match the target era for that role.` : "";
 
@@ -912,7 +1088,16 @@ function pickOrchestraWeighted({
     if (avail < sizeTarget) continue; // must support the tanda size
     const rc = recentCount(orch);     // 0, 1, 2...
     const jitter = 0.85 + 0.30 * Math.random();
-    const weight = avail * jitter * (1 / (1 + rc));
+    
+    // Apply diversity bonus: reduce dominance of orchestras with too many tracks
+    let diversityMultiplier = 1.0;
+    if (avail <= 15) {
+      diversityMultiplier = 1.2; // 20% bonus for medium-sized orchestras
+    } else if (avail > 30) {
+      diversityMultiplier = 0.6; // 40% penalty for orchestras with many tracks
+    }
+    
+    const weight = avail * jitter * (1 / (1 + rc)) * diversityMultiplier;
     if (weight > 0) bag.push({ orch, weight });
   }
 
@@ -1227,7 +1412,21 @@ export function registerAgentRoutes(app) {
             );
 
             if (candidatesAll.length > 0) {
-              const candidates = candidatesAll.slice(0, 80).map((t) => ({
+              const candidates = candidatesAll.slice(0, 200).map((t) => ({
+                id: getId(t),
+                title: t.title ?? t?.tags?.title ?? t?.metadata?.title ?? "Unknown",
+                artist: (t?.artist ?? t?.tags?.artist ?? t?.metadata?.artist ?? "Unknown").trim(),
+                seconds: durationSec(t) || null,
+                bpm: t?.BPM ?? t?.bpm ?? t?.audio?.bpm ?? t?.tags?.BPM ?? t?.tags?.tempoBPM ?? null,
+                energy: t?.Energy ?? t?.energy ?? t?.audio?.energy ?? t?.tags?.Energy ?? null,
+                camelotKey: keyToCamelot(t),
+              }));
+
+              // Also prepare broader candidate pool for broadening if needed
+              const allStyleCandidates = workingSet.filter((t) =>
+                (Array.isArray(t?.tags?.genre) ? t.tags.genre[0] : t?.tags?.genre) === style &&
+                !isUsed(getId(t))
+              ).map((t) => ({
                 id: getId(t),
                 title: t.title ?? t?.tags?.title ?? t?.metadata?.title ?? "Unknown",
                 artist: (t?.artist ?? t?.tags?.artist ?? t?.metadata?.artist ?? "Unknown").trim(),
@@ -1243,6 +1442,7 @@ export function registerAgentRoutes(app) {
                 remainingMinutes: Math.floor(remainingSeconds / 60),
                 usedIds: used, // Set is fine; we normalize checks via isUsed/markUsed
                 candidates,
+                allStyleCandidates, // Add broader candidate pool for broadening
                 orchestra: targetOrchestra,
                 prevKey,
                 onLLMOutput,
@@ -1322,6 +1522,7 @@ export function registerAgentRoutes(app) {
               remainingMinutes: Math.floor(remainingSeconds / 60),
               usedIds: used,
               candidates: styleOnlyCandidates,
+              allStyleCandidates: styleOnlyCandidates, // Same as candidates for fallback
               orchestra: null,
               prevKey,
               onLLMOutput,
@@ -2081,23 +2282,31 @@ export function registerAgentRoutes(app) {
 
   // ---- Retry Tanda endpoint ----
   app.post("/api/agent/retryTanda", async (req, res) => {
+    // ------------------------ NDJSON setup ------------------------
+    res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8");
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Transfer-Encoding", "chunked");
+    const send = (obj) => res.write(JSON.stringify(obj) + "\n");
+    
+    // Helper to stream LLM output to the client
+    const streamLLMOutput = (text) => {
+      send({ type: "llm_message", text });
+    };
+
     try {
       const { tandaIndex, currentTanda, avoidOrchestras = [], catalog } = req.body;
 
       if (!currentTanda || typeof tandaIndex !== 'number') {
-        return res.status(400).json({ 
-          success: false, 
-          error: "Missing required fields: tandaIndex and currentTanda" 
-        });
+        send({ type: "error", error: "Missing required fields: tandaIndex and currentTanda" });
+        return res.end();
       }
 
       if (!catalog || !Array.isArray(catalog.tracks)) {
-        return res.status(400).json({ 
-          success: false, 
-          error: "Missing catalog.tracks for retry" 
-        });
+        send({ type: "error", error: "Missing catalog.tracks for retry" });
+        return res.end();
       }
 
+      streamLLMOutput(`[RETRY TANDA] Starting retry for tanda ${tandaIndex} (${currentTanda.orchestra})`);
       console.log(`[RETRY TANDA] Starting retry for tanda ${tandaIndex} (${currentTanda.orchestra})`);
 
       // Use the same catalog setup as bulkGenerate
@@ -2128,28 +2337,66 @@ export function registerAgentRoutes(app) {
         });
 
       if (!workingSet.length) {
-        return res.status(400).json({ 
-          success: false, 
-          error: "No matching tracks found in library" 
-        });
+        send({ type: "error", error: "No matching tracks found in library" });
+        return res.end();
       }
 
-      // Build orchestra profiles and get alternatives
-      const profiles = buildOrchestraProfiles(workingSet);
-      const alternativeOrchestras = getAlternativeOrchestras(
-        profiles, 
-        [currentTanda.orchestra, ...avoidOrchestras]
-      );
+      // Normalize orchestra names to handle variations like "Alfredo de Angelis" vs "Alfredo de Angelis O.T."
+      const normalizeOrchestra = (orch) => {
+        if (!orch) return "";
+        return String(orch)
+          .replace(/\s+O\.T\.\s*(con\s+)?.*$/i, '') // Remove "O.T. con..." part
+          .replace(/\s+(y\s+su\s+orquesta.*|Y\s+Su.*)/i, '') // Remove "y su orquesta" variations
+          .trim();
+      };
+
+      // Get orchestras that are actually available in the workingSet
+      // Note: LIBRARY tracks have artist in tags.artist field based on catalog-Art.json structure
+      let availableOrchestras = [...new Set(workingSet.map(track => {
+        return track?.tags?.artist ?? track?.artist ?? track?.metadata?.artist ?? null;
+      }))].filter(Boolean);
+      
+      streamLLMOutput(`[RETRY TANDA] WorkingSet size: ${workingSet.length}, Available orchestras: ${availableOrchestras.length}`);
+      console.log(`[RETRY TANDA] WorkingSet orchestras:`, availableOrchestras.slice(0, 5));
+      
+      // If workingSet is too small (like from a loaded playlist), use full library for orchestra diversity
+      if (availableOrchestras.length < 5) {
+        const fullLibraryOrchestras = [...new Set(LIBRARY.map(track => {
+          return track?.tags?.artist ?? track?.artist ?? track?.metadata?.artist ?? null;
+        }))].filter(Boolean);
+        streamLLMOutput(`[RETRY TANDA] WorkingSet too small, using full library with ${fullLibraryOrchestras.length} orchestras`);
+        console.log(`[RETRY TANDA] Full library orchestras:`, fullLibraryOrchestras.slice(0, 5));
+        
+        availableOrchestras = fullLibraryOrchestras;
+      }
+      
+      // Normalize avoidance list to catch orchestra name variations
+      const normalizedAvoid = [currentTanda.orchestra, ...avoidOrchestras]
+        .map(normalizeOrchestra)
+        .filter(Boolean);
+      
+      streamLLMOutput(`[RETRY TANDA] Normalized avoid list: ${normalizedAvoid.join(', ')}`);
+      
+      // Filter available orchestras to exclude those we want to avoid
+      const alternativeOrchestras = availableOrchestras.filter(orch => {
+        const normalized = normalizeOrchestra(orch);
+        return !normalizedAvoid.includes(normalized);
+      });
+
+      streamLLMOutput(`[RETRY TANDA] Available alternatives: ${alternativeOrchestras.slice(0, 3).join(', ')}`);
+      streamLLMOutput(`[RETRY TANDA] Avoiding orchestras: ${[currentTanda.orchestra, ...avoidOrchestras].join(', ')}`);
+      console.log(`[RETRY TANDA] Available alternatives:`, alternativeOrchestras);
+      console.log(`[RETRY TANDA] Avoiding orchestras:`, [currentTanda.orchestra, ...avoidOrchestras]);
 
       if (alternativeOrchestras.length === 0) {
-        return res.status(400).json({ 
-          success: false, 
-          error: "No alternative orchestras available for retry" 
-        });
+        send({ type: "error", error: "No alternative orchestras available for retry" });
+        return res.end();
       }
 
       // Filter candidates for the requested style
-      const candidates = workingSet.filter(t => {
+      // Use full library if workingSet is too small (like from loaded playlist)
+      const candidateSource = workingSet.length < 50 ? LIBRARY : workingSet;
+      const candidates = candidateSource.filter(t => {
         const hasStyle = (t) => {
           const g = t?.styles?.length ? t.styles
                   : Array.isArray(t?.tags?.genre) ? t.tags.genre
@@ -2162,34 +2409,114 @@ export function registerAgentRoutes(app) {
         };
         return hasStyle(t);
       });
+      
+      streamLLMOutput(`[RETRY TANDA] Using ${candidateSource === LIBRARY ? 'full library' : 'workingSet'} as candidate source`);
+      streamLLMOutput(`[RETRY TANDA] Candidates available: ${candidates.length}`);
 
-      // Use the existing planOneTandaWithRetry function
-      const result = await planOneTandaWithRetry({
-        style: currentTanda.style,
-        size: currentTanda.trackCount || 4,
-        remainingMinutes: 20, // 20 minutes for a single tanda retry
-        usedIds: new Set(), // Fresh session for retry
-        candidates,
-        orchestra: alternativeOrchestras[0], // Use the best alternative
-        prevKey: null,
-        profiles,
-        maxRetries: 3
-      });
+      // Build orchestra profiles for planOneTandaWithRetry
+      const profiles = buildOrchestraProfiles(candidateSource);
+
+      // Extract all track IDs currently used in the playlist to avoid duplicates
+      const currentTrackIds = new Set();
+      if (req.body.currentPlaylist && Array.isArray(req.body.currentPlaylist)) {
+        req.body.currentPlaylist.forEach(tanda => {
+          if (tanda.tracks && Array.isArray(tanda.tracks)) {
+            tanda.tracks.forEach(track => {
+              if (track.id) currentTrackIds.add(track.id);
+              if (track.path) currentTrackIds.add(track.path);
+              if (track.uri) currentTrackIds.add(track.uri);
+            });
+          }
+        });
+      }
+
+      streamLLMOutput(`[RETRY TANDA] Avoiding ${currentTrackIds.size} tracks from current playlist`);
+
+      // Try multiple orchestras from alternatives if needed
+      let result = null;
+      let usedAlternative = null;
+
+      for (let i = 0; i < Math.min(alternativeOrchestras.length, 3); i++) {
+        const targetOrchestra = alternativeOrchestras[i];
+        streamLLMOutput(`[RETRY TANDA] Attempt ${i + 1}: Trying orchestra ${targetOrchestra}`);
+        console.log(`[RETRY TANDA] Attempt ${i + 1}: Trying orchestra ${targetOrchestra}`);
+
+        try {
+          result = await planOneTandaWithRetry({
+            style: currentTanda.style,
+            size: currentTanda.trackCount || 4,
+            remainingMinutes: 20, // 20 minutes for a single tanda retry
+            usedIds: currentTrackIds, // Use track IDs from current playlist to avoid duplicates
+            candidates,
+            allStyleCandidates: candidates, // Same as candidates for retry (full library)
+            orchestra: targetOrchestra,
+            prevKey: null,
+            profiles,
+            maxRetries: 2, // Reduced retries per orchestra since we try multiple
+            onLLMOutput: streamLLMOutput // Pass LLM output streaming to tanda generation
+          });
+
+          if (result && result.trackIds && result.trackIds.length > 0) {
+            usedAlternative = targetOrchestra;
+            streamLLMOutput(`[RETRY TANDA] ✅ Success with orchestra ${targetOrchestra}`);
+            console.log(`[RETRY TANDA] ✅ Success with orchestra ${targetOrchestra}`);
+            break;
+          }
+        } catch (error) {
+          streamLLMOutput(`[RETRY TANDA] ❌ Failed with orchestra ${targetOrchestra}: ${error.message}`);
+          console.log(`[RETRY TANDA] ❌ Failed with orchestra ${targetOrchestra}:`, error.message);
+          // Continue to next orchestra
+        }
+      }
 
       if (result && result.trackIds && result.trackIds.length > 0) {
-        console.log(`[RETRY TANDA] ✅ Successfully generated new tanda with ${result.trackIds.length} tracks`);
+        streamLLMOutput(`[RETRY TANDA] ✅ Successfully generated new tanda with ${result.trackIds.length} tracks using ${usedAlternative}`);
+        console.log(`[RETRY TANDA] ✅ Successfully generated new tanda with ${result.trackIds.length} tracks using ${usedAlternative}`);
         
         // Convert trackIds back to track objects
+        console.log(`[RETRY TANDA] Converting ${result.trackIds.length} trackIds:`, result.trackIds);
+        console.log(`[RETRY TANDA] Candidates available:`, candidates.length);
+        
+        // Debug: show sample candidate IDs
+        const sampleCandidateIds = candidates.slice(0, 5).map(t => getId(t));
+        console.log(`[RETRY TANDA] Sample candidate IDs:`, sampleCandidateIds);
+        
         const tracks = result.trackIds.map(id => {
-          const track = candidates.find(t => getId(t) === id);
-          return track ? trackToCompactPlayable(track) : null;
+          // First try exact match
+          let track = candidates.find(t => getId(t) === id);
+          
+          // If not found, try matching by filename (handle path vs filename mismatch)
+          if (!track) {
+            track = candidates.find(t => {
+              const candId = getId(t);
+              if (!candId) return false;
+              
+              // Extract filename from full path
+              const candFilename = candId.split('/').pop() || candId;
+              const searchFilename = id.split('/').pop() || id;
+              
+              return candFilename === searchFilename || candId.endsWith('/' + id) || candId.endsWith(id);
+            });
+          }
+          
+          if (!track) {
+            console.log(`[RETRY TANDA] ❌ Track not found for ID: ${id}`);
+            return null;
+          }
+          
+          const compactTrack = trackToCompactPlayable(track);
+          console.log(`[RETRY TANDA] ✅ Converted track: ${compactTrack?.title} by ${compactTrack?.artist}`);
+          return compactTrack;
         }).filter(Boolean);
+        
+        console.log(`[RETRY TANDA] Final tracks array:`, tracks);
 
         // Determine the orchestra from the tracks
         const orchestras = tracks.map(t => t.artist).filter(Boolean);
-        const newOrchestra = orchestras.length > 0 ? orchestras[0] : alternativeOrchestras[0];
+        const newOrchestra = orchestras.length > 0 ? orchestras[0] : usedAlternative;
         
-        return res.json({
+        send({
+          type: "success",
           success: true,
           tanda: {
             orchestra: newOrchestra,
@@ -2204,10 +2531,13 @@ export function registerAgentRoutes(app) {
             trackCount: tracks.length
           }
         });
+        return res.end();
       } else {
+        streamLLMOutput(`[RETRY TANDA] ❌ Failed to generate replacement tanda: No tracks found`);
         console.log(`[RETRY TANDA] ❌ Failed to generate replacement tanda: No tracks found`);
         
-        return res.status(500).json({
+        send({
+          type: "error",
           success: false,
           error: "No tracks found for replacement tanda",
           details: {
@@ -2219,13 +2549,168 @@ export function registerAgentRoutes(app) {
             warnings: result?.warnings
           }
         });
+        return res.end();
       }
 
     } catch (error) {
+      streamLLMOutput(`[RETRY TANDA] Error: ${error.message}`);
       console.error("[RETRY TANDA] Error:", error);
-      return res.status(500).json({
+      send({
+        type: "error",
         success: false,
         error: error.message || "Internal server error during tanda retry"
+      });
+      return res.end();
+    }
+  });
+
+  // Helper function to format structured review into readable text
+  function formatReviewResult(parsedContent) {
+    console.log(`🔍 [AI REVIEW] Formatting review result...`);
+    console.log(`🔍 [AI REVIEW] parsedContent keys:`, Object.keys(parsedContent || {}));
+    
+    // The parsedContent should now be the direct finalOutput from the agent
+
+    const sections = [
+      `**Orchestra Selection & Variety**\n${parsedContent.orchestraAnalysis || 'Analysis not available'}`,
+      `**Musical Flow & Energy**\n${parsedContent.musicalFlow || 'Analysis not available'}`,
+      `**Style Balance**\n${parsedContent.styleBalance || 'Analysis not available'}`,
+      `**Danceability**\n${parsedContent.danceability || 'Analysis not available'}`,
+      `**DJ Craft**\n${parsedContent.djCraft || 'Analysis not available'}`,
+      `**Audience Engagement**\n${parsedContent.audienceEngagement || 'Analysis not available'}`,
+      `**Overall Assessment**\n${parsedContent.overallAssessment || 'Assessment not available'}`
+    ];
+
+    let formattedReview = sections.join('\n\n');
+
+    if (parsedContent.recommendations && Array.isArray(parsedContent.recommendations) && parsedContent.recommendations.length > 0) {
+      formattedReview += '\n\n**Recommendations**\n';
+      parsedContent.recommendations.forEach(rec => {
+        formattedReview += `• ${rec}\n`;
+      });
+    }
+
+    console.log(`📝 [AI REVIEW] Formatted review length: ${formattedReview.length} characters`);
+    return formattedReview;
+  }
+
+  // ---- AI-Powered Playlist Review endpoint ----
+  app.post("/api/agent/review", async (req, res) => {
+    try {
+      const { playlist, programmaticAnalysis } = req.body;
+
+      if (!playlist || !Array.isArray(playlist.tandas)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Missing required field: playlist with tandas array" 
+        });
+      }
+
+      console.log(`\n${'='.repeat(60)}`);
+      console.log(`🤖 [AI REVIEW] Starting GPT-4o playlist review`);
+      console.log(`📋 Playlist: ${playlist.tandas.length} tandas, ${Math.round(playlist.duration / 60)} minutes`);
+      console.log(`${'='.repeat(60)}\n`);
+
+      // Prepare the playlist data for the LLM
+      const playlistSummary = playlist.tandas.map((tanda, index) => ({
+        tandaNumber: index + 1,
+        orchestra: tanda.orchestra,
+        style: tanda.style,
+        trackCount: tanda.tracks?.length || 0,
+        tracks: tanda.tracks?.map(track => ({
+          title: track.title,
+          artist: track.artist,
+          year: track.year,
+          bpm: track.bpm,
+          energy: track.energy,
+          camelotKey: track.camelotKey
+        })) || []
+      }));
+
+      // Create a comprehensive prompt for the LLM
+      const reviewPrompt = `You are a professional Argentine tango DJ with decades of experience in milonga programming. 
+
+Please provide a detailed review of this tango playlist, analyzing it from the perspective of a seasoned milonguero and DJ.
+
+PLAYLIST OVERVIEW:
+- Total tandas: ${playlist.tandas.length}
+- Duration: ${Math.round(playlist.duration / 60)} minutes
+- Selected schedule: ${playlist.selectedSchedule || 'Standard'}
+
+TANDA BREAKDOWN:
+${playlistSummary.map(tanda => 
+  `Tanda ${tanda.tandaNumber}: ${tanda.orchestra} - ${tanda.style} (${tanda.trackCount} tracks)
+  Tracks: ${tanda.tracks.map(t => `"${t.title}" ${t.year ? `(${t.year})` : ''} ${t.bpm ? `${t.bpm}bpm` : ''} ${t.camelotKey ? `Key:${t.camelotKey}` : ''}`).join(', ')}`
+).join('\n\n')}
+
+${programmaticAnalysis ? `\nPROGRAMMATIC ANALYSIS RESULTS:
+${programmaticAnalysis}` : ''}
+
+Please provide a professional DJ review covering:
+
+1. **Orchestra Selection & Variety**: Analyze the choice and sequencing of orchestras throughout the milonga
+2. **Musical Flow & Energy**: Evaluate how the energy builds and flows across tandas
+3. **Style Balance**: Comment on the distribution and timing of Tango/Vals/Milonga tandas
+4. **Danceability**: Assess how well this playlist would work for social dancing
+5. **DJ Craft**: Note any particularly clever programming choices or missed opportunities
+6. **Audience Engagement**: Predict how dancers might respond to this selection
+
+Write in a conversational, expert tone as if advising a fellow DJ. Be specific about track and orchestra choices where relevant.`;
+
+      // Call AI review agent using the existing agent setup
+      console.log(`🚀 [AI REVIEW] Calling GPT-4o playlist review agent...`);
+      console.log(`📝 [AI REVIEW] Prompt preview: ${reviewPrompt.substring(0, 300)}...\n`);
+      
+      const reviewResult = await run(playlistReviewAgent, reviewPrompt, { 
+        maxTurns: 1,
+        onUpdate: (update) => {
+          console.log(`📡 [AI REVIEW] Agent update:`, update);
+        }
+      });
+      
+      if (!reviewResult) {
+        throw new Error('No review result received from AI agent');
+      }
+
+      console.log(`\n✅ [AI REVIEW] GPT-4o Agent Response:`);
+      console.log(`${'─'.repeat(60)}`);
+      console.log(`finalOutput:`, JSON.stringify(reviewResult.finalOutput, null, 2));
+      console.log(`${'─'.repeat(60)}\n`);
+
+      // Use finalOutput like other agents do
+      const parsedContent = reviewResult.finalOutput;
+      if (!parsedContent) {
+        throw new Error('No finalOutput received from AI agent');
+      }
+
+      // Format the structured review into readable text
+      const aiReview = formatReviewResult(parsedContent);
+
+      console.log(`🎯 [AI REVIEW] ✅ Successfully generated AI review (${aiReview.length} characters)`);
+      console.log(`📝 [AI REVIEW] Formatted review preview: ${aiReview.substring(0, 200)}...`);
+      console.log(`${'='.repeat(60)}\n`);
+      
+      return res.json({
+        success: true,
+        review: aiReview,
+        agentInteraction: {
+          prompt: reviewPrompt,
+          rawResponse: parsedContent,
+          formattedResponse: aiReview
+        },
+        metadata: {
+          model: 'gpt-4o',
+          tandaCount: playlist.tandas.length,
+          duration: playlist.duration,
+          reviewLength: aiReview.length
+        }
+      });
+
+    } catch (error) {
+      console.error("[AI REVIEW] Error:", error);
+      return res.status(500).json({
+        success: false,
+        error: error.message || "Internal server error during AI review"
       });
     }
   });
@@ -2631,12 +3116,24 @@ export function registerAgentStreamRoutes(app){
                 camelotKey: keyToCamelot(t),
               }));
 
+              // Create broader candidate pool from all available tracks for broadening
+              const allStyleCandidates = baseRolePool.map((t) => ({
+                id: getId(t),
+                title: t.title ?? t?.tags?.title ?? t?.metadata?.title ?? "Unknown",
+                artist: (t?.artist ?? t?.tags?.artist ?? t?.metadata?.artist ?? "Unknown").trim(),
+                seconds: durationSec(t) || null,
+                BPM: t?.BPM ?? t?.bpm ?? t?.audio?.bpm ?? t?.tags?.BPM ?? t?.tags?.tempoBPM ?? null,
+                energy: t?.Energy ?? t?.energy ?? t?.audio?.energy ?? t?.tags?.Energy ?? null,
+                camelotKey: keyToCamelot(t),
+              }));
+
               const next = await planOneTandaWithRetry({
                 style,
                 size: sizeTarget,
                 remainingMinutes: Math.floor(remainingSeconds / 60),
                 usedIds: usedIds,
                 candidates,
+                allStyleCandidates, // Add broader candidate pool
                 orchestra: targetOrchestra,
                 prevKey,
                 onLLMOutput: streamLLMOutput,
@@ -2736,6 +3233,7 @@ export function registerAgentStreamRoutes(app){
             remainingMinutes: Math.floor(remainingSeconds / 60),
             usedIds: usedIds,
             candidates: styleOnly.slice(0, 60),
+            allStyleCandidates: styleOnly, // Use full styleOnly as broader pool
             orchestra: null,
             prevKey,
             onLLMOutput: streamLLMOutput,

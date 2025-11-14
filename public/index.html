@@ -44,7 +44,6 @@
         <ul id="tandas"></ul>
         <div id="summary"></div>
         <button id="tanda-gen">Generate Tandas (stream)</button>
-        <button id="genplan">Agent Bulk Generator</button>
         <button id="review">Agent Review</button>
         <button id="swap">Swap</button>
         <button id="next">Next Track</button>
@@ -1272,7 +1271,7 @@
         // Update a single source of truth
         PLAN.tandas[idx] = {
           ...PLAN.tandas[idx],
-          type: "tanda",
+          type: "cortina", // Fixed: should be "cortina", not "tanda"
           style: "Cortina",
           cortinaGenre:
             newC.cortinagenre || PLAN.tandas[idx]?.cortinaGenre || "default",
@@ -1751,6 +1750,7 @@
 
         PLAN = { tandas: [], totalMinutes: 0 };
         clearReplacementHistory(); // Clear history when generating new plan
+        window.tandaRetryHistory = {}; // Clear retry history for new plan
         timelineEl.innerHTML = "";
         totalEl.textContent = "";
         summaryEl.textContent = "";
@@ -1762,107 +1762,100 @@
         let built = 0;
 
         try {
-          await streamPlan(
-            {
-              minutes,
-              pattern: ["Tango", "Tango", "Vals", "Tango", "Tango", "Milonga"],
-              sizes: { Tango: 4, Vals: 3, Milonga: 3 },
-              catalog: window.currentCatalog,
-            },
-            (evt) => {
-              switch (evt.type) {
-                case "start":
-                  summaryEl.textContent = "Planning…";
-                  logLine("Agent: start");
-                  break;
+          const body = await buildGenerateBody();
+          await streamPlan(body, (evt) => {
+            switch (evt.type) {
+              case "start":
+                summaryEl.textContent = "Planning…";
+                logLine("Agent: start");
+                break;
 
-                case "llm_delta": // <— OPTIONAL: if your backend emits token deltas
-                  appendLLM(evt.text || "");
-                  break;
+              case "llm_delta": // <— OPTIONAL: if your backend emits token deltas
+                appendLLM(evt.text || "");
+                break;
 
-                case "llm_message": // <— OPTIONAL: full chunked message event
-                  appendLLM((evt.text || "") + "\n");
-                  break;
+              case "llm_message": // <— OPTIONAL: full chunked message event
+                appendLLM((evt.text || "") + "\n");
+                break;
 
-                case "tanda":
-                  built += 1;
-                  logLine(`Tanda #${built} (${evt.tanda.style}) constructed`);
-                  const approxMinutes = Math.max(
-                    1,
-                    Math.round((evt.tanda.seconds || 0) / 60)
-                  );
-                  PLAN.tandas.push({
-                    type: "tanda",
-                    style: evt.tanda.style,
-                    size: evt.tanda.tracks.length,
-                    approxMinutes,
-                    tracks: evt.tanda.tracks.map((t) => ({
-                      id: t.id,
-                      title: t.title,
-                      artist: t.artist,
-                      BPM: getBPM(t) ?? t.BPM ?? null,
-                      Energy: t.energy ?? t.Energy ?? null,
-                      Key: t.key ?? t.Key ?? null,
-                      camelotKey: t.camelotKey ?? null,
-                    })),
-                  });
-                  PLAN.totalMinutes += approxMinutes;
+              case "tanda":
+                built += 1;
+                logLine(`Tanda #${built} (${evt.tanda.style}) constructed`);
+                const approxMinutes = Math.max(
+                  1,
+                  Math.round((evt.tanda.seconds || 0) / 60)
+                );
+                PLAN.tandas.push({
+                  type: "tanda",
+                  style: evt.tanda.style,
+                  size: evt.tanda.tracks.length,
+                  approxMinutes,
+                  tracks: evt.tanda.tracks.map((t) => ({
+                    id: t.id,
+                    title: t.title,
+                    artist: t.artist,
+                    BPM: getBPM(t) ?? t.BPM ?? null,
+                    Energy: t.energy ?? t.Energy ?? null,
+                    Key: t.key ?? t.Key ?? null,
+                    camelotKey: t.camelotKey ?? null,
+                  })),
+                });
+                PLAN.totalMinutes += approxMinutes;
+                renderPlan();
+                summaryEl.textContent = `Built ${built} tandas…`;
+                break;
+
+              case "summary":
+                logLine(
+                  `Summary: ${evt.summary.tandaCount} tandas, ~${evt.summary.minutesPlanned} minutes`,
+                  "ok"
+                );
+                summaryEl.textContent = `Planned ${evt.summary.tandaCount} tandas; ~${evt.summary.minutesPlanned} minutes.`;
+                break;
+
+              case "done": {
+                logLine("Planning complete", "ok");
+
+                // The server's DONE payload already includes the interleaved plan (tandas + cortinas).
+                // Normalize it (works for both interleaved and split shapes) and adopt it.
+                const normalized = normalizePlanResponse(evt);
+
+                if (normalized) {
+                  PLAN = normalized;
+                  enrichCortinaMetadataInPlan();
                   renderPlan();
-                  summaryEl.textContent = `Built ${built} tandas…`;
-                  break;
-
-                case "summary":
-                  logLine(
-                    `Summary: ${evt.summary.tandaCount} tandas, ~${evt.summary.minutesPlanned} minutes`,
-                    "ok"
-                  );
-                  summaryEl.textContent = `Planned ${evt.summary.tandaCount} tandas; ~${evt.summary.minutesPlanned} minutes.`;
-                  break;
-
-                case "done": {
-                  logLine("Planning complete", "ok");
-
-                  // The server's DONE payload already includes the interleaved plan (tandas + cortinas).
-                  // Normalize it (works for both interleaved and split shapes) and adopt it.
-                  const normalized = normalizePlanResponse(evt);
-
-                  if (normalized) {
-                    PLAN = normalized;
-                    enrichCortinaMetadataInPlan();
-                    renderPlan();
-                  }
-                  // After setStatus({ text: "Ready", state: "ok" });
-                  if (Array.isArray(evt.plan?.cortinas)) {
-                    setCortinaPool(evt.plan.cortinas);
-                    enrichCortinaMetadataInPlan();
-                    renderPlan();
-                  }
-
-                  const minutesPlanned =
-                    evt.display?.summary?.minutesPlanned ??
-                    PLAN?.totalMinutes ??
-                    minutes;
-
-                  totalEl.textContent = `(${minutesPlanned} min, ${
-                    PLAN?.tandas?.filter((x) => x.type === "tanda").length ?? 0
-                  } tandas)`;
-                  etaEl.textContent = clockAdd(minutesPlanned);
-                  setStatus({ text: "Ready", state: "ok" });
-                  updateCortinaModeIndicator(); // Update mode indicator
-                  break;
+                }
+                // After setStatus({ text: "Ready", state: "ok" });
+                if (Array.isArray(evt.plan?.cortinas)) {
+                  setCortinaPool(evt.plan.cortinas);
+                  enrichCortinaMetadataInPlan();
+                  renderPlan();
                 }
 
-                case "error":
-                  logLine(`Agent error: ${evt.message || "unknown"}`, "err");
-                  setStatus({ text: "Error", state: "err" });
-                  break;
+                const minutesPlanned =
+                  evt.display?.summary?.minutesPlanned ??
+                  PLAN?.totalMinutes ??
+                  minutes;
 
-                default:
-                  // keep unknowns visible for debugging
-                  if (evt.info) logLine(String(evt.info));
+                totalEl.textContent = `(${minutesPlanned} min, ${
+                  PLAN?.tandas?.filter((x) => x.type === "tanda").length ?? 0
+                } tandas)`;
+                etaEl.textContent = clockAdd(minutesPlanned);
+                setStatus({ text: "Ready", state: "ok" });
+                updateCortinaModeIndicator(); // Update mode indicator
+                break;
               }
+
+              case "error":
+                logLine(`Agent error: ${evt.message || "unknown"}`, "err");
+                setStatus({ text: "Error", state: "err" });
+                break;
+
+              default:
+                // keep unknowns visible for debugging
+                if (evt.info) logLine(String(evt.info));
             }
-          );
+          });
         } catch (e) {
           logLine(`Stream failed: ${e.message || e}`, "err");
           setStatus({ text: "Error", state: "err" });
@@ -1994,76 +1987,6 @@
           seq.reduce((m, b) => m + (b.approxMinutes || 0), 0);
 
         return { tandas: seq, totalMinutes };
-      }
-      // ---------- One-shot agent endpoint (JSON, not stream) ----------
-      async function agentGeneratePlan() {
-        const catalog = await loadCatalogForPlannerFromPairs();
-        window.currentCatalog = {
-          tracks: (catalog.tracks || []).map((t) => ({
-            id: t.id,
-            file: {
-              absolutePath:
-                t.file?.absolutePath ?? getAbsolutePath(t) ?? t.path ?? null,
-            },
-            title: t.title,
-            artist: t.artist,
-            BPM: getBPM(t),
-            Energy: t.Energy ?? null,
-            Key: t.Key ?? null,
-            camelotKey: t.camelotKey ?? null,
-            styles: t.styles,
-            artUrl: t.artUrl,
-          })),
-        };
-        const body = await buildGenerateBody();
-        const minutes = Number($("#minutes").value || 180);
-        //const payload = { minutes, catalog: window.currentCatalog };
-        const res = await fetch("/api/agent/bulkGenerate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-
-        const text = await res.text();
-        let data = {};
-        try {
-          data = text ? JSON.parse(text) : {};
-          // after `data = text ? JSON.parse(text) : {};`
-          if (Array.isArray(data?.plan?.cortinas)) {
-            setCortinaPool(data.plan.cortinas);
-          }
-        } catch (_) {}
-
-        if (!res.ok) {
-          console.error("Agent error body:", text);
-          alert((data && data.error) || `Agent error (HTTP ${res.status}).`);
-          return;
-        }
-
-        const normalized = normalizePlanResponse(data);
-        if (!normalized) {
-          console.error("Raw server body:", text);
-          alert("Malformed plan returned by server.");
-          return;
-        }
-
-        PLAN = normalized;
-        enrichCortinaMetadataInPlan();
-        curIdx = -1;
-        curTrackOffset = 0;
-        renderPlan();
-
-        const minutesPlanned =
-          PLAN.totalMinutes ??
-          PLAN.tandas.reduce((m, b) => m + (b.approxMinutes || 0), 0);
-
-        totalEl.textContent = `(${minutesPlanned} min, ${
-          PLAN.tandas.filter((x) => x.type === "tanda").length
-        } tandas)`;
-        etaEl.textContent = clockAdd(minutesPlanned);
-        nowEl.textContent = "–";
-        player.src = "";
-        updateCortinaModeIndicator(); // Update mode indicator
       }
 
       // ---------- Timeline rendering & playback ----------
@@ -2391,7 +2314,7 @@
 
           // Transform to cortina format
           const formattedCortinas = cortinas.map((track) => ({
-            id: track.id,
+            id: track.absolutePath || track.id, // Use absolutePath (raw file path) instead of encoded id
             title: track.title,
             artist: track.artist,
             genre: genre,
@@ -2609,7 +2532,49 @@
 
           setNowLabel(`Retrying tanda ${tandaIndex + 1}...`);
 
+          // Track retry attempts per tanda to cycle through orchestras
+          if (!window.tandaRetryHistory) {
+            window.tandaRetryHistory = {};
+          }
+
+          if (!window.tandaRetryHistory[tandaIndex]) {
+            window.tandaRetryHistory[tandaIndex] = {
+              originalOrchestra: tanda.orchestra,
+              triedOrchestras: [tanda.orchestra], // Include current
+              attemptCount: 0,
+            };
+          }
+
+          const retryHistory = window.tandaRetryHistory[tandaIndex];
+          retryHistory.attemptCount++;
+
+          console.log(
+            `🔄 Retry attempt ${retryHistory.attemptCount} for tanda ${
+              tandaIndex + 1
+            }`
+          );
+          console.log(
+            `🎭 Previously tried orchestras:`,
+            retryHistory.triedOrchestras
+          );
+
           // Prepare the retry request
+          // Collect all orchestras currently used in the playlist (excluding the one we're retrying)
+          const currentOrchestras = PLAN.tandas
+            .filter(
+              (t, idx) =>
+                idx !== tandaIndex && t.type === "tanda" && t.orchestra
+            )
+            .map((t) => t.orchestra);
+
+          // Combine previously tried orchestras with orchestras currently used elsewhere in playlist
+          const allAvoidOrchestras = [
+            ...retryHistory.triedOrchestras,
+            ...currentOrchestras,
+          ].filter((orch, idx, arr) => orch && arr.indexOf(orch) === idx); // Remove duplicates and nulls
+
+          console.log(`🚫 Avoiding orchestras:`, allAvoidOrchestras);
+
           const retryData = {
             tandaIndex: tandaIndex,
             currentTanda: {
@@ -2617,7 +2582,8 @@
               style: tanda.style,
               trackCount: (tanda.tracks || []).length,
             },
-            avoidOrchestras: [tanda.orchestra], // Avoid current orchestra for variety
+            avoidOrchestras: allAvoidOrchestras, // Avoid previously tried + currently used orchestras
+            currentPlaylist: PLAN.tandas, // Send current playlist to avoid track duplicates
             catalog: await ensureCatalogReady(),
           };
 
@@ -2633,23 +2599,113 @@
             );
           }
 
-          const result = await response.json();
+          // Handle streaming NDJSON response
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let result = null;
+
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              const chunk = decoder.decode(value, { stream: true });
+              const lines = chunk.split("\n").filter((line) => line.trim());
+
+              for (const line of lines) {
+                try {
+                  const data = JSON.parse(line);
+
+                  if (data.type === "llm_message") {
+                    // Add to LLM transcript
+                    appendLLM((data.text || "") + "\n");
+                  } else if (data.type === "success") {
+                    console.log("📦 Received success data:", data);
+                    result = data;
+                  } else if (data.type === "error") {
+                    throw new Error(data.error || "Retry failed");
+                  }
+                } catch (parseError) {
+                  console.warn(
+                    "Failed to parse NDJSON line:",
+                    line,
+                    parseError
+                  );
+                }
+              }
+            }
+          } finally {
+            reader.releaseLock();
+          }
+
+          if (!result) {
+            throw new Error("No result received from retry");
+          }
+
           console.log(
             `✅ Retry successful for tanda ${tandaIndex + 1}:`,
             result
           );
 
+          console.log(
+            "🔍 Checking result.success:",
+            result.success,
+            "result.tanda:",
+            result.tanda
+          );
+
           if (result.success && result.tanda) {
+            // Track the new orchestra in retry history
+            const retryHistory = window.tandaRetryHistory[tandaIndex];
+            if (
+              retryHistory &&
+              !retryHistory.triedOrchestras.includes(result.tanda.orchestra)
+            ) {
+              retryHistory.triedOrchestras.push(result.tanda.orchestra);
+            }
+
+            console.log(
+              `✅ New tanda generated with orchestra: ${result.tanda.orchestra}`
+            );
+            console.log(
+              `🎭 Total orchestras tried for this tanda:`,
+              retryHistory?.triedOrchestras || []
+            );
+
             // Replace the problematic tanda
+            console.log(
+              "🔄 Before replacement - PLAN.tandas[" + tandaIndex + "]:",
+              PLAN.tandas[tandaIndex]
+            );
             PLAN.tandas[tandaIndex] = {
               type: "tanda",
               orchestra: result.tanda.orchestra,
               style: result.tanda.style,
               tracks: result.tanda.tracks || [],
             };
+            console.log(
+              "🔄 After replacement - PLAN.tandas[" + tandaIndex + "]:",
+              PLAN.tandas[tandaIndex]
+            );
 
             // Re-render the plan
-            renderPlan();
+            console.log("🎨 Calling renderPlan()");
+            try {
+              renderPlan();
+              console.log("✅ renderPlan() completed successfully");
+            } catch (renderError) {
+              console.error("❌ renderPlan() failed:", renderError);
+            }
+
+            // Restore card state after successful retry
+            const tandaCard = document.querySelector(
+              `[data-tanda-index="${tandaIndex}"]`
+            );
+            if (tandaCard) {
+              tandaCard.style.opacity = "1";
+              tandaCard.style.pointerEvents = "auto";
+            }
+
             setNowLabel(
               `Tanda ${tandaIndex + 1} successfully regenerated with ${
                 result.tanda.orchestra
@@ -2823,9 +2879,809 @@
         player.pause();
       }
 
+      // Auto-advance with 5-second delay
+      function nextWithDelay() {
+        setNowLabel("Next track in 5 seconds...");
+        setTimeout(() => {
+          next();
+        }, 5000); // 5 second delay
+      }
+
       function playPause() {
         if (player.paused) player.play().catch(() => {});
         else player.pause();
+      }
+
+      // ========== PLAYLIST REVIEW FUNCTIONS ==========
+      function reviewPlaylist(plan) {
+        const issues = [];
+        const warnings = [];
+        const info = [];
+        const orchestraAnalysis = {};
+        const styleAnalysis = {};
+        const tandaDetails = [];
+
+        if (!plan || !Array.isArray(plan.tandas)) {
+          issues.push("Invalid playlist structure");
+          return {
+            issues,
+            warnings,
+            info,
+            score: 0,
+            orchestraAnalysis,
+            styleAnalysis,
+            tandaDetails,
+          };
+        }
+
+        const tandas = plan.tandas.filter((t) => t.type === "tanda");
+        const cortinas = plan.tandas.filter((t) => t.type === "cortina");
+
+        // 1. Check for missing tracks
+        let missingTracks = 0;
+        let totalTracks = 0;
+
+        tandas.forEach((tanda, idx) => {
+          if (!tanda.tracks || tanda.tracks.length === 0) {
+            issues.push(`Tanda ${idx + 1} (${tanda.style}) has no tracks`);
+            return;
+          }
+
+          tanda.tracks.forEach((track, trackIdx) => {
+            totalTracks++;
+            if (!track.id || !track.title || track.title === "replace this") {
+              missingTracks++;
+              issues.push(
+                `Tanda ${idx + 1}, Track ${
+                  trackIdx + 1
+                }: Missing or invalid track`
+              );
+            }
+          });
+
+          // Check tanda size expectations
+          const expectedSize = tanda.style === "Tango" ? 4 : 3;
+          if (tanda.tracks.length < expectedSize) {
+            warnings.push(
+              `Tanda ${idx + 1} (${tanda.style}) has only ${
+                tanda.tracks.length
+              } tracks (expected ${expectedSize})`
+            );
+          }
+        });
+
+        // 2. Check cortina placement and coverage
+        const totalBlocks = plan.tandas.length;
+        const expectedCortinas = Math.max(0, tandas.length - 1); // cortina between each tanda pair
+
+        if (cortinas.length === 0) {
+          warnings.push(
+            "No cortinas found - dancers won't have breaks between tandas"
+          );
+        } else if (cortinas.length < expectedCortinas) {
+          warnings.push(
+            `Only ${cortinas.length} cortinas for ${tandas.length} tandas (expected ~${expectedCortinas})`
+          );
+        }
+
+        // 3. Check cortina track validity
+        cortinas.forEach((cortina, idx) => {
+          if (
+            !cortina.streamId &&
+            (!cortina.tracks || cortina.tracks.length === 0)
+          ) {
+            issues.push(`Cortina ${idx + 1}: No track assigned`);
+          } else if (cortina.tracks && cortina.tracks.length > 0) {
+            const track = cortina.tracks[0];
+            if (!track.id || !track.title) {
+              issues.push(`Cortina ${idx + 1}: Invalid track data`);
+            }
+          }
+        });
+
+        // 4. Check playlist duration and pacing
+        const totalMinutes =
+          plan.totalMinutes ||
+          plan.tandas.reduce(
+            (sum, block) => sum + (block.approxMinutes || 0),
+            0
+          );
+
+        if (totalMinutes < 60) {
+          warnings.push(
+            `Playlist is quite short (${Math.round(totalMinutes)} minutes)`
+          );
+        } else if (totalMinutes > 240) {
+          warnings.push(
+            `Playlist is quite long (${Math.round(totalMinutes)} minutes)`
+          );
+        }
+
+        // 5. Check style variety
+        const styleCount = {};
+        tandas.forEach((tanda) => {
+          const style = tanda.style || "Unknown";
+          styleCount[style] = (styleCount[style] || 0) + 1;
+        });
+
+        const styles = Object.keys(styleCount);
+        if (styles.length === 1) {
+          warnings.push(
+            `Only ${styles[0]} tandas - consider adding Vals and Milonga for variety`
+          );
+        }
+
+        // 6. Check for duplicate tracks
+        const trackIds = new Set();
+        const duplicates = [];
+
+        tandas.forEach((tanda, tandaIdx) => {
+          tanda.tracks?.forEach((track, trackIdx) => {
+            if (track.id) {
+              if (trackIds.has(track.id)) {
+                duplicates.push(`"${track.title}" appears multiple times`);
+              } else {
+                trackIds.add(track.id);
+              }
+            }
+          });
+        });
+
+        if (duplicates.length > 0) {
+          warnings.push(...duplicates.slice(0, 5)); // Limit to first 5 duplicates
+          if (duplicates.length > 5) {
+            warnings.push(`... and ${duplicates.length - 5} more duplicates`);
+          }
+        }
+
+        // 7. Generate summary info
+        info.push(`${tandas.length} tandas, ${cortinas.length} cortinas`);
+        info.push(`${totalTracks} total tracks, ${missingTracks} missing`);
+        info.push(`~${Math.round(totalMinutes)} minutes total`);
+
+        const stylesSummary = Object.entries(styleCount)
+          .map(([style, count]) => `${count} ${style}`)
+          .join(", ");
+        if (stylesSummary) {
+          info.push(`Styles: ${stylesSummary}`);
+        }
+
+        // 8. Enhanced Orchestra and Style Analysis
+        tandas.forEach((tanda, idx) => {
+          const tandaInfo = {
+            number: idx + 1,
+            style: tanda.style,
+            role: tanda.role || "classic",
+            tracks: [],
+            orchestras: new Set(),
+            years: [],
+            keys: [],
+            bpms: [],
+          };
+
+          if (tanda.tracks) {
+            tanda.tracks.forEach((track) => {
+              if (track.artist) {
+                tandaInfo.orchestras.add(track.artist);
+                if (!orchestraAnalysis[track.artist]) {
+                  orchestraAnalysis[track.artist] = {
+                    count: 0,
+                    styles: new Set(),
+                    roles: new Set(),
+                  };
+                }
+                orchestraAnalysis[track.artist].count++;
+                orchestraAnalysis[track.artist].styles.add(tanda.style);
+                orchestraAnalysis[track.artist].roles.add(
+                  tanda.role || "classic"
+                );
+              }
+
+              if (track.BPM) tandaInfo.bpms.push(track.BPM);
+              if (track.Key) tandaInfo.keys.push(track.Key);
+
+              tandaInfo.tracks.push({
+                title: track.title || "Unknown",
+                artist: track.artist || "Unknown",
+                bpm: track.BPM || null,
+                key: track.Key || null,
+                camelotKey: track.camelotKey || null,
+              });
+            });
+          }
+
+          // Style analysis
+          if (!styleAnalysis[tanda.style]) {
+            styleAnalysis[tanda.style] = {
+              count: 0,
+              roles: new Set(),
+              orchestras: new Set(),
+              avgBPM: null,
+              bpmRange: null,
+            };
+          }
+          styleAnalysis[tanda.style].count++;
+          styleAnalysis[tanda.style].roles.add(tanda.role || "classic");
+          tandaInfo.orchestras.forEach((orch) =>
+            styleAnalysis[tanda.style].orchestras.add(orch)
+          );
+
+          // Calculate BPM statistics for this tanda
+          if (tandaInfo.bpms.length > 0) {
+            const avgBPM =
+              tandaInfo.bpms.reduce((sum, bpm) => sum + bpm, 0) /
+              tandaInfo.bpms.length;
+            tandaInfo.avgBPM = Math.round(avgBPM * 10) / 10;
+            tandaInfo.bpmRange = `${Math.min(...tandaInfo.bpms)}-${Math.max(
+              ...tandaInfo.bpms
+            )}`;
+          }
+
+          tandaDetails.push(tandaInfo);
+        });
+
+        // Calculate style BPM averages
+        Object.keys(styleAnalysis).forEach((style) => {
+          const styleTandas = tandaDetails.filter((t) => t.style === style);
+          const allBPMs = styleTandas.flatMap((t) => t.bpms);
+          if (allBPMs.length > 0) {
+            styleAnalysis[style].avgBPM =
+              Math.round(
+                (allBPMs.reduce((sum, bpm) => sum + bpm, 0) / allBPMs.length) *
+                  10
+              ) / 10;
+            styleAnalysis[style].bpmRange = `${Math.min(...allBPMs)}-${Math.max(
+              ...allBPMs
+            )}`;
+          }
+        });
+
+        // Calculate overall score (0-100)
+        let score = 100;
+        score -= issues.length * 20; // Major issues
+        score -= warnings.length * 5; // Minor issues
+        score = Math.max(0, Math.min(100, score));
+
+        return {
+          issues,
+          warnings,
+          info,
+          score,
+          orchestraAnalysis,
+          styleAnalysis,
+          tandaDetails,
+          totalMinutes: Math.round(totalMinutes),
+          planName:
+            plan.name || `Milonga Plan - ${new Date().toLocaleDateString()}`,
+        };
+      }
+
+      function generateProgrammaticSummary(review) {
+        const {
+          issues,
+          warnings,
+          info,
+          score,
+          orchestraAnalysis,
+          styleAnalysis,
+          tandaDetails,
+          totalMinutes,
+        } = review;
+
+        let summary = `TECHNICAL ANALYSIS SUMMARY:\n`;
+        summary += `Overall Score: ${score}/100\n`;
+        summary += `Duration: ${totalMinutes} minutes\n`;
+        summary += `Issues: ${issues.length} critical, ${warnings.length} warnings\n\n`;
+
+        // Style breakdown
+        if (Object.keys(styleAnalysis).length > 0) {
+          summary += `STYLE DISTRIBUTION:\n`;
+          Object.entries(styleAnalysis).forEach(([style, data]) => {
+            summary += `- ${style}: ${data.count} tandas`;
+            if (data.avgBPM) summary += ` (avg ${data.avgBPM} BPM)`;
+            summary += `\n`;
+          });
+          summary += `\n`;
+        }
+
+        // Orchestra variety
+        if (Object.keys(orchestraAnalysis).length > 0) {
+          const sortedOrchestras = Object.entries(orchestraAnalysis)
+            .sort(([, a], [, b]) => b.count - a.count)
+            .slice(0, 10); // Top 10 orchestras
+          summary += `TOP ORCHESTRAS:\n`;
+          sortedOrchestras.forEach(([orch, data]) => {
+            summary += `- ${orch}: ${data.count} tracks (${Array.from(
+              data.styles
+            ).join(", ")})\n`;
+          });
+          summary += `\n`;
+        }
+
+        // Critical issues
+        if (issues.length > 0) {
+          summary += `CRITICAL ISSUES:\n`;
+          issues.forEach((issue) => (summary += `- ${issue}\n`));
+          summary += `\n`;
+        }
+
+        // Warnings
+        if (warnings.length > 0) {
+          summary += `WARNINGS:\n`;
+          warnings
+            .slice(0, 5)
+            .forEach((warning) => (summary += `- ${warning}\n`));
+          if (warnings.length > 5)
+            summary += `... and ${warnings.length - 5} more warnings\n`;
+        }
+
+        return summary;
+      }
+
+      function displayEnhancedReviewResults(review) {
+        const { issues, warnings, score, aiReview } = review;
+
+        // Quick summary alert with AI enhancement note
+        let message = `🤖 AI-ENHANCED PLAYLIST REVIEW 🤖\n`;
+        message += `Overall Score: ${score}/100\n\n`;
+
+        if (issues.length === 0 && warnings.length === 0) {
+          message += `✅ EXCELLENT! No issues found.\n`;
+          message += `Your playlist looks ready for the milonga! 💃🕺\n\n`;
+        } else if (issues.length === 0) {
+          message += `✅ Good playlist! Only ${warnings.length} minor warnings.\n\n`;
+        } else {
+          message += `❌ ${issues.length} critical issues and ${warnings.length} warnings found.\n\n`;
+        }
+
+        message += `✨ Includes professional DJ insights from AI analysis\n`;
+        message += `Click OK to open detailed review report.`;
+        alert(message);
+
+        // Open enhanced detailed review in viewer window
+        openEnhancedDetailedReview(review);
+
+        // Also log to console for detailed inspection
+        console.log("Enhanced Playlist Review Details:", review);
+      }
+
+      function openEnhancedDetailedReview(review) {
+        const {
+          issues,
+          warnings,
+          info,
+          score,
+          orchestraAnalysis,
+          styleAnalysis,
+          tandaDetails,
+          totalMinutes,
+          planName,
+          aiReview,
+          aiMetadata,
+        } = review;
+
+        // Open or focus the viewer window
+        if (!window.reviewWin || window.reviewWin.closed) {
+          window.reviewWin = window.open(
+            "/viewer.html",
+            "PlaylistReview",
+            "width=900,height=1000,scrollbars=yes,resizable=yes"
+          );
+        }
+
+        // Wait a moment for the window to load, then send the enhanced review data
+        setTimeout(() => {
+          if (window.reviewWin) {
+            const enhancedHTML = generateEnhancedReviewHTML(review);
+            window.reviewWin.postMessage(
+              {
+                type: "review",
+                html: enhancedHTML,
+                title: `AI-Enhanced Review: ${planName || "Milonga Plan"}`,
+              },
+              "*"
+            );
+          }
+        }, 500);
+      }
+
+      function generateEnhancedReviewHTML(review) {
+        const {
+          issues,
+          warnings,
+          info,
+          score,
+          orchestraAnalysis,
+          styleAnalysis,
+          tandaDetails,
+          totalMinutes,
+          planName,
+          aiReview,
+          aiMetadata,
+        } = review;
+
+        let html = `
+          <div style="max-width: 100%; padding: 20px; font-family: sans-serif; line-height: 1.6;">
+            <h1 style="color: #4CAF50; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">
+              🤖 ${planName || "Milonga Plan"} - AI-Enhanced Review
+            </h1>`;
+
+        // AI Review Section (prominently featured at the top)
+        if (aiReview) {
+          html += `
+            <div style="background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%); padding: 20px; border-radius: 12px; margin: 20px 0; border: 2px solid #3f51b5;">
+              <h2 style="color: #FFD700; margin-top: 0; display: flex; align-items: center; gap: 10px;">
+                ✨ Professional DJ Analysis (AI-Powered)
+                <span style="font-size: 0.6em; background: #FFD700; color: #1a237e; padding: 4px 8px; border-radius: 12px; font-weight: bold;">${
+                  aiMetadata?.model || "AI"
+                }</span>
+              </h2>
+              <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; color: #e3f2fd; line-height: 1.8; white-space: pre-wrap; font-size: 1.05em;">
+${aiReview}
+              </div>
+            </div>`;
+        }
+
+        html += `
+            <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <h2 style="color: #FFD700; margin-top: 0;">📊 Technical Analysis Overview</h2>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div><strong>Overall Score:</strong> ${score}/100</div>
+                <div><strong>Total Duration:</strong> ~${totalMinutes} minutes</div>
+                <div><strong>Tandas:</strong> ${tandaDetails.length}</div>
+                <div><strong>Issues:</strong> ${issues.length} critical, ${warnings.length} warnings</div>
+              </div>
+            </div>`;
+
+        // Rest of the existing review HTML generation (style analysis, orchestra analysis, etc.)
+        // Style Analysis
+        if (Object.keys(styleAnalysis).length > 0) {
+          html += `
+            <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <h2 style="color: #FFD700; margin-top: 0;">💃 Style Analysis</h2>
+              <div style="display: grid; gap: 15px;">`;
+
+          Object.entries(styleAnalysis).forEach(([style, data]) => {
+            const roles = Array.from(data.roles).join(", ");
+            const orchestras = Array.from(data.orchestras)
+              .slice(0, 5)
+              .join(", ");
+            const moreOrchestras =
+              data.orchestras.size > 5
+                ? ` (+${data.orchestras.size - 5} more)`
+                : "";
+
+            html += `
+              <div style="border-left: 4px solid #4CAF50; padding-left: 15px;">
+                <h3 style="color: #4CAF50; margin: 0 0 8px 0;">${style}</h3>
+                <div><strong>Count:</strong> ${data.count} tandas</div>
+                <div><strong>Roles:</strong> ${roles}</div>
+                ${
+                  data.avgBPM
+                    ? `<div><strong>BPM:</strong> ${data.avgBPM} avg (${data.bpmRange})</div>`
+                    : ""
+                }
+                <div><strong>Orchestras:</strong> ${orchestras}${moreOrchestras}</div>
+              </div>`;
+          });
+
+          html += `</div></div>`;
+        }
+
+        // Orchestra Analysis
+        if (Object.keys(orchestraAnalysis).length > 0) {
+          html += `
+            <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <h2 style="color: #FFD700; margin-top: 0;">🎼 Orchestra Analysis</h2>
+              <div style="display: grid; gap: 10px;">`;
+
+          const sortedOrchestras = Object.entries(orchestraAnalysis).sort(
+            ([, a], [, b]) => b.count - a.count
+          );
+
+          sortedOrchestras.forEach(([orchestra, data]) => {
+            const styles = Array.from(data.styles).join(", ");
+            const roles = Array.from(data.roles).join(", ");
+
+            html += `
+              <div style="border-left: 3px solid #FF9800; padding-left: 12px; margin: 8px 0;">
+                <strong style="color: #FF9800;">${orchestra}</strong>
+                <span style="color: #ccc;"> - ${data.count} track${
+              data.count > 1 ? "s" : ""
+            }</span>
+                <div style="font-size: 0.9em; color: #aaa;">
+                  Styles: ${styles} | Roles: ${roles}
+                </div>
+              </div>`;
+          });
+
+          html += `</div></div>`;
+        }
+
+        // Issues and Warnings
+        if (issues.length > 0 || warnings.length > 0) {
+          html += `
+            <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <h2 style="color: #FFD700; margin-top: 0;">⚠️ Technical Issues & Recommendations</h2>`;
+
+          if (issues.length > 0) {
+            html += `
+              <div style="margin: 15px 0;">
+                <h3 style="color: #f44336; margin: 0 0 8px 0;">❌ Critical Issues</h3>`;
+            issues.forEach((issue) => {
+              html += `<div style="color: #f44336; margin: 5px 0;">• ${issue}</div>`;
+            });
+            html += `</div>`;
+          }
+
+          if (warnings.length > 0) {
+            html += `
+              <div style="margin: 15px 0;">
+                <h3 style="color: #ff9800; margin: 0 0 8px 0;">⚠️ Warnings</h3>`;
+            warnings.forEach((warning) => {
+              html += `<div style="color: #ff9800; margin: 5px 0;">• ${warning}</div>`;
+            });
+            html += `</div>`;
+          }
+
+          html += `</div>`;
+        }
+
+        html += `
+            <div style="text-align: center; margin: 30px 0; padding: 20px; background: #1a1a1a; border-radius: 8px;">
+              <div style="font-size: 1.2em; color: #4CAF50;">
+                AI-Enhanced Review completed at ${new Date().toLocaleString()}
+              </div>
+              ${
+                aiMetadata
+                  ? `<div style="color: #999; font-size: 0.9em; margin-top: 8px;">
+                Model: ${aiMetadata.model} • Tandas: ${
+                      aiMetadata.tandaCount
+                    } • Duration: ${Math.round(aiMetadata.duration / 60)}min
+              </div>`
+                  : ""
+              }
+            </div>
+          </div>`;
+
+        return html;
+      }
+
+      function displayReviewResults(review) {
+        const { issues, warnings, info, score } = review;
+
+        // Quick summary alert
+        let message = `🎵 PLAYLIST REVIEW REPORT 🎵\n`;
+        message += `Overall Score: ${score}/100\n\n`;
+
+        if (issues.length === 0 && warnings.length === 0) {
+          message += `✅ EXCELLENT! No issues found.\n`;
+          message += `Your playlist looks ready for the milonga! 💃🕺\n\n`;
+        } else if (issues.length === 0) {
+          message += `✅ Good playlist! Only ${warnings.length} minor warnings.\n\n`;
+        } else {
+          message += `❌ ${issues.length} critical issues and ${warnings.length} warnings found.\n\n`;
+        }
+
+        message += `Click OK to open detailed review report.`;
+        alert(message);
+
+        // Open detailed review in viewer window
+        openDetailedReview(review);
+
+        // Also log to console for detailed inspection
+        console.log("Playlist Review Details:", review);
+      }
+
+      function openDetailedReview(review) {
+        const {
+          issues,
+          warnings,
+          info,
+          score,
+          orchestraAnalysis,
+          styleAnalysis,
+          tandaDetails,
+          totalMinutes,
+          planName,
+        } = review;
+
+        // Open or focus the viewer window
+        if (!window.reviewWin || window.reviewWin.closed) {
+          window.reviewWin = window.open(
+            "/viewer.html",
+            "PlaylistReview",
+            "width=800,height=900,scrollbars=yes,resizable=yes"
+          );
+        }
+
+        // Wait a moment for the window to load, then send the review data
+        setTimeout(() => {
+          if (window.reviewWin) {
+            const reviewHTML = generateReviewHTML(review);
+            window.reviewWin.postMessage(
+              {
+                type: "review",
+                html: reviewHTML,
+                title: `Review: ${planName}`,
+              },
+              "*"
+            );
+          }
+        }, 500);
+      }
+
+      function generateReviewHTML(review) {
+        const {
+          issues,
+          warnings,
+          info,
+          score,
+          orchestraAnalysis,
+          styleAnalysis,
+          tandaDetails,
+          totalMinutes,
+          planName,
+        } = review;
+
+        let html = `
+          <div style="max-width: 100%; padding: 20px; font-family: sans-serif; line-height: 1.6;">
+            <h1 style="color: #4CAF50; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">
+              🎵 ${planName} - Review Report
+            </h1>
+            
+            <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <h2 style="color: #FFD700; margin-top: 0;">📊 Overview</h2>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div><strong>Overall Score:</strong> ${score}/100</div>
+                <div><strong>Total Duration:</strong> ~${totalMinutes} minutes</div>
+                <div><strong>Tandas:</strong> ${tandaDetails.length}</div>
+                <div><strong>Issues:</strong> ${issues.length} critical, ${warnings.length} warnings</div>
+              </div>
+            </div>`;
+
+        // Style Analysis
+        if (Object.keys(styleAnalysis).length > 0) {
+          html += `
+            <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <h2 style="color: #FFD700; margin-top: 0;">💃 Style Analysis</h2>
+              <div style="display: grid; gap: 15px;">`;
+
+          Object.entries(styleAnalysis).forEach(([style, data]) => {
+            const roles = Array.from(data.roles).join(", ");
+            const orchestras = Array.from(data.orchestras)
+              .slice(0, 5)
+              .join(", ");
+            const moreOrchestras =
+              data.orchestras.size > 5
+                ? ` (+${data.orchestras.size - 5} more)`
+                : "";
+
+            html += `
+              <div style="border-left: 4px solid #4CAF50; padding-left: 15px;">
+                <h3 style="color: #4CAF50; margin: 0 0 8px 0;">${style}</h3>
+                <div><strong>Count:</strong> ${data.count} tandas</div>
+                <div><strong>Roles:</strong> ${roles}</div>
+                ${
+                  data.avgBPM
+                    ? `<div><strong>BPM:</strong> ${data.avgBPM} avg (${data.bpmRange})</div>`
+                    : ""
+                }
+                <div><strong>Orchestras:</strong> ${orchestras}${moreOrchestras}</div>
+              </div>`;
+          });
+
+          html += `</div></div>`;
+        }
+
+        // Orchestra Analysis
+        if (Object.keys(orchestraAnalysis).length > 0) {
+          html += `
+            <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <h2 style="color: #FFD700; margin-top: 0;">🎼 Orchestra Analysis</h2>
+              <div style="display: grid; gap: 10px;">`;
+
+          const sortedOrchestras = Object.entries(orchestraAnalysis).sort(
+            ([, a], [, b]) => b.count - a.count
+          );
+
+          sortedOrchestras.forEach(([orchestra, data]) => {
+            const styles = Array.from(data.styles).join(", ");
+            const roles = Array.from(data.roles).join(", ");
+
+            html += `
+              <div style="border-left: 3px solid #FF9800; padding-left: 12px; margin: 8px 0;">
+                <strong style="color: #FF9800;">${orchestra}</strong>
+                <span style="color: #ccc;"> - ${data.count} track${
+              data.count > 1 ? "s" : ""
+            }</span>
+                <div style="font-size: 0.9em; color: #aaa;">
+                  Styles: ${styles} | Roles: ${roles}
+                </div>
+              </div>`;
+          });
+
+          html += `</div></div>`;
+        }
+
+        // Detailed Tanda Breakdown
+        if (tandaDetails.length > 0) {
+          html += `
+            <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <h2 style="color: #FFD700; margin-top: 0;">📝 Tanda Details</h2>`;
+
+          tandaDetails.forEach((tanda) => {
+            const orchestras =
+              Array.from(tanda.orchestras).join(", ") || "Various";
+
+            html += `
+              <div style="border: 1px solid #444; border-radius: 6px; padding: 12px; margin: 12px 0;">
+                <h3 style="color: #4CAF50; margin: 0 0 8px 0;">
+                  Tanda ${tanda.number}: ${tanda.style} (${tanda.role})
+                </h3>
+                <div style="margin-bottom: 8px;">
+                  <strong>Orchestras:</strong> ${orchestras}
+                  ${
+                    tanda.avgBPM
+                      ? `<br><strong>BPM:</strong> ${tanda.avgBPM} avg (${tanda.bpmRange})`
+                      : ""
+                  }
+                </div>
+                <div style="margin-left: 15px;">`;
+
+            tanda.tracks.forEach((track, idx) => {
+              html += `
+                <div style="margin: 4px 0; color: #ccc;">
+                  ${idx + 1}. ${track.title} - ${track.artist}
+                  ${track.bpm ? ` (${track.bpm} BPM)` : ""}
+                  ${track.key ? ` [${track.key}]` : ""}
+                </div>`;
+            });
+
+            html += `</div></div>`;
+          });
+
+          html += `</div>`;
+        }
+
+        // Issues and Warnings
+        if (issues.length > 0 || warnings.length > 0) {
+          html += `
+            <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <h2 style="color: #FFD700; margin-top: 0;">⚠️ Issues & Recommendations</h2>`;
+
+          if (issues.length > 0) {
+            html += `
+              <div style="margin: 15px 0;">
+                <h3 style="color: #f44336; margin: 0 0 8px 0;">❌ Critical Issues</h3>`;
+            issues.forEach((issue) => {
+              html += `<div style="color: #f44336; margin: 5px 0;">• ${issue}</div>`;
+            });
+            html += `</div>`;
+          }
+
+          if (warnings.length > 0) {
+            html += `
+              <div style="margin: 15px 0;">
+                <h3 style="color: #ff9800; margin: 0 0 8px 0;">⚠️ Warnings</h3>`;
+            warnings.forEach((warning) => {
+              html += `<div style="color: #ff9800; margin: 5px 0;">• ${warning}</div>`;
+            });
+            html += `</div>`;
+          }
+
+          html += `</div>`;
+        }
+
+        html += `
+            <div style="text-align: center; margin: 30px 0; padding: 20px; background: #1a1a1a; border-radius: 8px;">
+              <div style="font-size: 1.2em; color: #4CAF50;">
+                Review completed at ${new Date().toLocaleString()}
+              </div>
+            </div>
+          </div>`;
+
+        return html;
       }
 
       function startPlan() {
@@ -2858,18 +3714,132 @@
       }, 1000);
 
       // Events & buttons
-      player.addEventListener("ended", next);
+      player.addEventListener("ended", nextWithDelay);
       $("#tanda-gen").onclick = tandaPlanner;
-      $("#genplan").onclick = agentGeneratePlan;
       $("#review").onclick = async () => {
-        if (!PLAN) return;
-        const res = await fetch("/api/agent/review", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ plan: PLAN }),
-        });
-        const data = await res.json();
-        alert(data.notes || "Agent done.");
+        if (!PLAN) {
+          alert("No playlist to review. Generate or load a playlist first.");
+          return;
+        }
+
+        // First, show loading message
+        alert(
+          "🤖 Generating comprehensive playlist review...\nThis includes both technical analysis and AI-powered DJ insights.\n\nPlease wait a moment while the AI reviews your selection."
+        );
+
+        try {
+          // Clear and start LLM transcript for AI review
+          setLLM("");
+          appendLLM("🤖 AI PLAYLIST REVIEW STARTED\n");
+          appendLLM("=".repeat(50) + "\n");
+          appendLLM(
+            `📋 Analyzing playlist: ${PLAN.tandas.length} tandas, ${Math.round(
+              PLAN.duration / 60
+            )} minutes\n\n`
+          );
+
+          // 1. Get programmatic analysis
+          appendLLM("🔍 Step 1: Running technical analysis...\n");
+          const programmaticReview = reviewPlaylist(PLAN);
+          appendLLM("✅ Technical analysis complete\n\n");
+
+          // 2. Prepare programmatic analysis as text for the AI
+          appendLLM("📝 Step 2: Preparing data for GPT-4o agent...\n");
+          const programmaticSummary =
+            generateProgrammaticSummary(programmaticReview);
+          appendLLM(
+            `📊 Technical summary: ${programmaticSummary.length} characters\n\n`
+          );
+
+          // 3. Call AI review endpoint
+          appendLLM("🚀 Step 3: Calling GPT-4o playlist review agent...\n");
+          appendLLM("⏳ Waiting for AI response...\n\n");
+
+          const aiResponse = await fetch("/api/agent/review", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              playlist: PLAN,
+              programmaticAnalysis: programmaticSummary,
+            }),
+          });
+
+          if (!aiResponse.ok) {
+            throw new Error(
+              `AI Review failed: ${aiResponse.status} ${aiResponse.statusText}`
+            );
+          }
+
+          const aiResult = await aiResponse.json();
+
+          if (!aiResult.success) {
+            appendLLM("❌ AI review failed: " + aiResult.error + "\n");
+            throw new Error(aiResult.error || "AI review failed");
+          }
+
+          appendLLM("✅ GPT-4o response received!\n");
+          appendLLM(`📊 Model: ${aiResult.metadata?.model || "GPT-4o"}\n`);
+          appendLLM(
+            `📝 Review length: ${
+              aiResult.metadata?.reviewLength || 0
+            } characters\n\n`
+          );
+
+          // Display the actual agent interaction like in streaming mode
+          if (aiResult.agentInteraction) {
+            appendLLM("🤖 GPT-4o AGENT INTERACTION:\n");
+            appendLLM("─".repeat(60) + "\n");
+            appendLLM("📤 PROMPT TO AGENT:\n");
+            appendLLM(aiResult.agentInteraction.prompt + "\n\n");
+
+            appendLLM("📥 RAW AGENT RESPONSE:\n");
+            if (aiResult.agentInteraction.rawResponse) {
+              const rawResp =
+                typeof aiResult.agentInteraction.rawResponse === "object"
+                  ? JSON.stringify(
+                      aiResult.agentInteraction.rawResponse,
+                      null,
+                      2
+                    )
+                  : aiResult.agentInteraction.rawResponse;
+              appendLLM(rawResp + "\n\n");
+            }
+            appendLLM("─".repeat(60) + "\n\n");
+          }
+
+          appendLLM("🎯 PROFESSIONAL DJ ANALYSIS:\n");
+          appendLLM("─".repeat(40) + "\n");
+          appendLLM(aiResult.review + "\n");
+          appendLLM("─".repeat(40) + "\n\n");
+
+          appendLLM("✨ AI REVIEW COMPLETE - Opening detailed view...\n");
+          appendLLM("=".repeat(50) + "\n");
+
+          // 4. Combine both analyses and display enhanced results
+          const enhancedReview = {
+            ...programmaticReview,
+            aiReview: aiResult.review,
+            aiMetadata: aiResult.metadata,
+          };
+
+          displayEnhancedReviewResults(enhancedReview);
+        } catch (error) {
+          console.error("Review error:", error);
+
+          appendLLM(`\n❌ ERROR: ${error.message}\n`);
+          appendLLM("🔄 Falling back to basic technical analysis only...\n");
+          appendLLM("=".repeat(50) + "\n");
+
+          alert(
+            `❌ Review failed: ${error.message}\n\nFalling back to basic analysis...`
+          );
+
+          // Fallback to programmatic review only
+          const review = reviewPlaylist(PLAN);
+          displayReviewResults(review);
+        }
       };
       $("#swap").onclick = () => {
         if (swapFirst === null)

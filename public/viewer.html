@@ -25,9 +25,21 @@
     <img id="cover" src="" alt="Album Art" />
     <script>
       window.addEventListener("message", (event) => {
-        const { tags, artUrl } = event.data;
+        const data = event.data;
+
+        // Handle playlist review messages
+        if (data.type === "review") {
+          document.title = data.title || "Playlist Review";
+          document.getElementById("cover").style.display = "none";
+          document.getElementById("meta").innerHTML = data.html;
+          return;
+        }
+
+        // Handle now playing messages
+        const { tags, artUrl } = data;
         if (!tags) return;
 
+        document.getElementById("cover").style.display = "block";
         document.getElementById("cover").src = artUrl;
 
         const lines = [
