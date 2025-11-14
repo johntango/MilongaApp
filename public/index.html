@@ -1866,10 +1866,15 @@
       // ---------- Non-stream deterministic planner endpoint ----------
       async function generatePlan() {
         const minutes = Number($("#minutes").value || 180);
+        const sizes = {
+          Tango: Number(getSize("Tango") || 4),
+          Vals: Number(getSize("Vals") || 3),
+          Milonga: Number(getSize("Milonga") || 3),
+        };
         const res = await fetch("/api/plan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ minutes }),
+          body: JSON.stringify({ minutes, sizes }),
         });
         const data = await res.json();
         if (!res.ok) {
