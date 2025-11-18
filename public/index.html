@@ -106,6 +106,32 @@
 
         <div class="space"></div>
         <div class="row">
+          <strong>Orchestra Search</strong>
+          <button class="tiny" id="orchestra-clear">Clear</button>
+        </div>
+        <div class="row">
+          <input
+            type="text"
+            id="orchestra-search"
+            placeholder="Search by orchestra name..."
+            style="width: 100%; margin-bottom: 8px"
+          />
+        </div>
+        <div
+          id="orchestra-results"
+          class="log"
+          style="max-height: 200px; display: none"
+        >
+          <div
+            id="orchestra-count"
+            class="muted"
+            style="margin-bottom: 8px"
+          ></div>
+          <div id="orchestra-tracks" style="font-size: 0.9em"></div>
+        </div>
+
+        <div class="space"></div>
+        <div class="row">
           <strong>LLM Transcript</strong>
           <button class="tiny" id="llm-clear">Clear</button>
         </div>
@@ -1023,6 +1049,93 @@
       const llmPre = $("#llm-transcript");
       $("#log-clear").onclick = () => (activityLog.textContent = "");
       $("#llm-clear").onclick = () => (llmPre.textContent = "");
+
+      // Orchestra search functionality
+      const orchestraSearchInput = $("#orchestra-search");
+      const orchestraResults = $("#orchestra-results");
+      const orchestraCount = $("#orchestra-count");
+      const orchestraTracks = $("#orchestra-tracks");
+
+      $("#orchestra-clear").onclick = () => {
+        orchestraSearchInput.value = "";
+        orchestraResults.style.display = "none";
+      };
+
+      /** Search orchestras and display results */
+      function searchOrchestra(searchTerm) {
+        if (!searchTerm.trim()) {
+          orchestraResults.style.display = "none";
+          return;
+        }
+
+        if (!window.catalogArt || !window.catalogArt.tracks) {
+          orchestraCount.textContent = "Catalog not loaded";
+          orchestraTracks.innerHTML = "";
+          orchestraResults.style.display = "block";
+          return;
+        }
+
+        const searchLower = searchTerm.toLowerCase();
+        const matchingTracks = window.catalogArt.tracks.filter((track) => {
+          const artist = track?.tags?.artist || track?.artist || "";
+          return artist.toLowerCase().includes(searchLower);
+        });
+
+        orchestraCount.textContent = `Found ${matchingTracks.length} tracks`;
+
+        if (matchingTracks.length === 0) {
+          orchestraTracks.innerHTML =
+            '<div class="muted">No tracks found</div>';
+        } else {
+          // Group by artist and show unique orchestras
+          const orchestraGroups = {};
+          matchingTracks.forEach((track) => {
+            const artist = track?.tags?.artist || track?.artist || "Unknown";
+            if (!orchestraGroups[artist]) {
+              orchestraGroups[artist] = [];
+            }
+            orchestraGroups[artist].push(track);
+          });
+
+          let html = "";
+          Object.keys(orchestraGroups)
+            .sort()
+            .forEach((artist) => {
+              const tracks = orchestraGroups[artist];
+              html += `<div style="margin-bottom: 12px;">`;
+              html += `<div style="font-weight: bold; color: #333; margin-bottom: 4px;">${artist} (${tracks.length} tracks)</div>`;
+
+              tracks.slice(0, 10).forEach((track) => {
+                // Show first 10 tracks per orchestra
+                const title =
+                  track?.tags?.title || track?.title || "Unknown Title";
+                const year = track?.tags?.year || "";
+                const duration = track?.tags?.duration || "";
+                html += `<div style="margin-left: 12px; margin-bottom: 2px; font-size: 0.85em; color: #666;">`;
+                html += `${title}`;
+                if (year) html += ` (${year})`;
+                if (duration) html += ` - ${duration}`;
+                html += `</div>`;
+              });
+
+              if (tracks.length > 10) {
+                html += `<div style="margin-left: 12px; font-size: 0.8em; color: #999;">... and ${
+                  tracks.length - 10
+                } more tracks</div>`;
+              }
+              html += `</div>`;
+            });
+
+          orchestraTracks.innerHTML = html;
+        }
+
+        orchestraResults.style.display = "block";
+      }
+
+      // Add search input event listener
+      orchestraSearchInput.addEventListener("input", (e) => {
+        searchOrchestra(e.target.value);
+      });
 
       /** Status badge (Idle/Busy/OK/Error) */
       function setStatus({ text = "Idle", state = "idle", busy = false } = {}) {
